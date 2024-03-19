@@ -9,6 +9,7 @@ com\myproject\dashboard\Dashboard$1.class
 com\myproject\models\types\StatusType.class
 com\myproject\forms\Form_2.class
 com\myproject\swings\TableStatus.class
+com\myproject\forms\Form_Goods$1.class
 com\myproject\models\Model_Card.class
 com\myproject\forms\Form_5.class
 com\myproject\forms\Form_Account.class
@@ -25,12 +26,12 @@ com\myproject\models\Model_Customer.class
 com\myproject\models\Model_Menu.class
 com\myproject\dashboard\Dashboard$2.class
 com\myproject\swings\PanelBorder.class
-com\myproject\forms\Form_3.class
 com\myproject\models\Model_Menu$MenuType.class
 com\myproject\components\Menu.class
 com\myproject\models\types\EmployeeStatus.class
 com\myproject\components\Header.class
 com\myproject\forms\Form_Home.class
+com\myproject\forms\Form_Goods.class
 com\myproject\models\types\RoomStatus.class
 com\myproject\models\Model_Employee.class
 com\myproject\swings\ListMenu$3.class
