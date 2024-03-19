@@ -4,6 +4,9 @@ import com.myproject.events.EventMenuSelected;
 import com.myproject.forms.Form_1;
 import com.myproject.forms.Form_2;
 import com.myproject.forms.Form_3;
+import com.myproject.forms.Form_4;
+import com.myproject.forms.Form_5;
+import com.myproject.forms.Form_Account;
 import com.myproject.forms.Form_Home;
 import java.awt.Color;
 import javax.swing.JComponent;
@@ -14,6 +17,10 @@ public class Dashboard extends javax.swing.JFrame {
     private Form_1 form1;
     private Form_2 form2;
     private Form_3 form3;
+    private Form_4 form4;
+    private Form_5 form5;
+    private Form_Account formAccount;
+
 
     public Dashboard() {
         initComponents();
@@ -22,6 +29,10 @@ public class Dashboard extends javax.swing.JFrame {
         form1 = new Form_1();
         form2 = new Form_2();
         form3 = new Form_3();
+        form4 = new Form_4();
+        form5 = new Form_5();
+        formAccount = new Form_Account();
+
         menu.initMoving(Dashboard.this);
         menu.addEventMenuSelected(new EventMenuSelected() {
             @Override
@@ -31,6 +42,10 @@ public class Dashboard extends javax.swing.JFrame {
                     case 3 -> setForm(form1);
                     case 4 -> setForm(form2);
                     case 5 -> setForm(form3);
+                    case 9 -> setForm(form4);
+                    case 10 -> setForm(form5);
+                    case 11 -> setForm(formAccount);
+
                     default -> {
                     }
                 }
