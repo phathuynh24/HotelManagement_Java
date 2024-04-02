@@ -6,7 +6,6 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import com.myproject.models.types.StatusType;
 import com.myproject.swings.ScrollBar;
 import java.awt.Color;
 import java.awt.GridLayout;
@@ -14,7 +13,11 @@ import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -28,33 +31,51 @@ import javax.swing.table.DefaultTableModel;
 import org.bson.Document;
 
 public class Form_Account extends javax.swing.JPanel {
+    
+    private List<User> userList = new ArrayList<>();
+    private DefaultTableModel tableModel;
+    private AddUserForm addUserForm;
+
     public Form_Account() {
         initComponents();
-
-        spTable.setVerticalScrollBar(new ScrollBar());
-        spTable.getVerticalScrollBar().setBackground(Color.WHITE);
-        spTable.getViewport().setBackground(Color.WHITE);
-        JPanel p = new JPanel();
-        p.setBackground(Color.WHITE);
-        spTable.setCorner(JScrollPane.UPPER_RIGHT_CORNER, p);
-        
+        customize();
         fetchDataFromMongoDB();
-        
-        /*table.addRow(new Object[]{"Mike Bhand", "mikebhand@gmail.com", "Admin", "25 Apr,2018", StatusType.PENDING});
-        table.addRow(new Object[]{"Andrew Strauss", "andrewstrauss@gmail.com", "Editor", "25 Apr,2018", StatusType.APPROVED});
-        table.addRow(new Object[]{"Ross Kopelman", "rosskopelman@gmail.com", "Subscriber", "25 Apr,2018", StatusType.APPROVED});
-        table.addRow(new Object[]{"Mike Hussy", "mikehussy@gmail.com", "Admin", "25 Apr,2018", StatusType.REJECT});
-        table.addRow(new Object[]{"Kevin Pietersen", "kevinpietersen@gmail.com", "Admin", "25 Apr,2018", StatusType.PENDING});
-        table.addRow(new Object[]{"Andrew Strauss", "andrewstrauss@gmail.com", "Editor", "25 Apr,2018", StatusType.APPROVED});
-        table.addRow(new Object[]{"Ross Kopelman", "rosskopelman@gmail.com", "Subscriber", "25 Apr,2018", StatusType.APPROVED});
-        table.addRow(new Object[]{"Mike Hussy", "mikehussy@gmail.com", "Admin", "25 Apr,2018", StatusType.REJECT});
-        table.addRow(new Object[]{"Kevin Pietersen", "kevinpietersen@gmail.com", "Admin", "25 Apr,2018", StatusType.PENDING});
-        table.addRow(new Object[]{"Kevin Pietersen", "kevinpietersen@gmail.com", "Admin", "25 Apr,2018", StatusType.PENDING});
-        table.addRow(new Object[]{"Andrew Strauss", "andrewstrauss@gmail.com", "Editor", "25 Apr,2018", StatusType.APPROVED});
-        table.addRow(new Object[]{"Ross Kopelman", "rosskopelman@gmail.com", "Subscriber", "25 Apr,2018", StatusType.APPROVED});
-        table.addRow(new Object[]{"Mike Hussy", "mikehussy@gmail.com", "Admin", "25 Apr,2018", StatusType.REJECT});
-        table.addRow(new Object[]{"Kevin Pietersen", "kevinpietersen@gmail.com", "Admin", "25 Apr,2018", StatusType.PENDING});*/
-        
+        displayUser();
+    }
+
+    public void fetchDataFromMongoDB() {
+        try (MongoClient mongoClient = MongoClients.create("mongodb+srv://HotelGroup:xfwl2Y6oahXJugda@cluster0.awr6sf9.mongodb.net/")) {
+            // Chọn cơ sở dữ liệu
+            MongoDatabase database = mongoClient.getDatabase("Hotel_Management");
+            // Chọn bảng
+            MongoCollection<Document> collection = database.getCollection("User");
+            FindIterable<Document> cursor = collection.find();
+            tableModel = (DefaultTableModel) table.getModel();
+            // Clear data
+            tableModel.setRowCount(0);
+            userList.clear();
+            
+            for (Document document : cursor) {
+                String value1 = document.getString("username");
+                String value2 = document.getString("fullName");
+                String value3 = document.getString("password");
+                User user = new User(value1, value2, value3);
+                addUserToListAndTable(user);
+            }
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+        }
+    }
+    
+    public void addUserToListAndTable(User user) {
+        // Thêm người dùng vào danh sách
+        userList.add(user);
+
+        // Thêm dòng mới vào bảng
+        tableModel.addRow(new Object[]{user.getUsername(), user.getFullName(), user.getPassword()});
+    }
+
+    private void displayUser() {
         table.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -62,9 +83,8 @@ public class Form_Account extends javax.swing.JPanel {
                 if (selectedRow != -1) {
                     // Lấy thông tin người dùng từ hàng được chọn
                     String username = table.getValueAt(selectedRow, 0).toString();
-                    String fullName = table.getValueAt(selectedRow, 1).toString();                    
+                    String fullName = table.getValueAt(selectedRow, 1).toString();
                     String password = table.getValueAt(selectedRow, 2).toString();
-
 
                     Map<String, String> userData = new HashMap<>();
                     userData.put("username", username);
@@ -73,40 +93,25 @@ public class Form_Account extends javax.swing.JPanel {
 
                     // Hiển thị form chỉnh sửa thông tin người dùng
                     EditUserForm editForm = new EditUserForm(userData);
+                    editForm.setVisible(true);
                 }
             }
         });
-        
-        int passwordColumnIndex = 2; // Chỉ mục của cột mật khẩu (đếm từ 0)
 
+        // Ẩn cột mật khẩu
+        int passwordColumnIndex = 2;
         table.getColumnModel().getColumn(passwordColumnIndex).setMinWidth(0);
         table.getColumnModel().getColumn(passwordColumnIndex).setMaxWidth(0);
         table.getColumnModel().getColumn(passwordColumnIndex).setWidth(0);
     }
-    
-    private void fetchDataFromMongoDB(){
-        try (MongoClient mongoClient = MongoClients.create("mongodb+srv://HotelGroup:xfwl2Y6oahXJugda@cluster0.awr6sf9.mongodb.net/")) {
-            // Chọn cơ sở dữ liệu
-            MongoDatabase database = mongoClient.getDatabase("Hotel_Management");
-            // Chọn bảng
-            MongoCollection<Document> collection = database.getCollection("User");
-            FindIterable<Document> cursor = collection.find();
-            DefaultTableModel model = (DefaultTableModel)table.getModel();
-            model.setRowCount(0);
-            // Tạo một Document mới chứa dữ liệu bạn muốn thêm
-            
-            for (Document document : cursor) {
-                String value1 = document.getString("username");
-                String value2 = document.getString("fullName");
-                String value3 = document.getString("password");
 
-                // Thêm hàng mới vào tableModel
-                model.addRow(new Object[]{value1, value2, value3});
-            }
-            // Thêm Document vào bảng
-        } catch (Exception e) {
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
-        }
+    private void customize() {
+        spTable.setVerticalScrollBar(new ScrollBar());
+        spTable.getVerticalScrollBar().setBackground(Color.WHITE);
+        spTable.getViewport().setBackground(Color.WHITE);
+        JPanel p = new JPanel();
+        p.setBackground(Color.WHITE);
+        spTable.setCorner(JScrollPane.UPPER_RIGHT_CORNER, p);
     }
 
     @SuppressWarnings("unchecked")
@@ -241,8 +246,14 @@ public class Form_Account extends javax.swing.JPanel {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        AddUserForm addUserForm = new AddUserForm();
-                addUserForm.setVisible(true);
+        if (addUserForm == null || !addUserForm.isVisible()) {
+        // Nếu form thêm chưa được mở hoặc đã bị đóng, thì tạo một form mới
+        addUserForm = new AddUserForm(this);
+        } else {
+            // Nếu form thêm đã được mở, đưa nó ra phía trước
+            addUserForm.toFront();
+        }
+        addUserForm.setVisible(true);
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
@@ -252,7 +263,7 @@ public class Form_Account extends javax.swing.JPanel {
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton4ActionPerformed
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
@@ -266,14 +277,18 @@ public class Form_Account extends javax.swing.JPanel {
 }
 
 class AddUserForm extends JFrame {
+    
     private JTextField txtUsername;
     private JTextField txtFullName;
     private JPasswordField txtPassword;
     private JPasswordField txtConfirmPassword;
+    private Form_Account formAccount;
 
-    public AddUserForm() {
+    public AddUserForm(Form_Account formAccount) {
+        this.formAccount = formAccount;
         setTitle("Thêm người dùng");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setSize(300, 200);
         setLocationRelativeTo(null);
 
@@ -295,7 +310,7 @@ class AddUserForm extends JFrame {
             String fullName = txtFullName.getText();
             String password = new String(txtPassword.getPassword());
             String confirmPassword = new String(txtConfirmPassword.getPassword());
-            
+
             if (username.isEmpty() || fullName.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
                 JOptionPane.showMessageDialog(AddUserForm.this, "Vui lòng điền đầy đủ thông tin.", "Lỗi", JOptionPane.ERROR_MESSAGE);
                 return;
@@ -306,11 +321,11 @@ class AddUserForm extends JFrame {
                 return;
             }
             
+            // Lưu dữ liệu lên mongodb
             try (
-                    MongoClient mongoClient = MongoClients.create("mongodb+srv://HotelGroup:xfwl2Y6oahXJugda@cluster0.awr6sf9.mongodb.net/")) {
+                MongoClient mongoClient = MongoClients.create("mongodb+srv://HotelGroup:xfwl2Y6oahXJugda@cluster0.awr6sf9.mongodb.net/")) {
                 // Chọn cơ sở dữ liệu
                 MongoDatabase database = mongoClient.getDatabase("Hotel_Management");
-                
                 // Chọn bảng
                 MongoCollection<Document> collection = database.getCollection("User");
                 // Tạo một Document mới chứa dữ liệu bạn muốn thêm
@@ -319,8 +334,10 @@ class AddUserForm extends JFrame {
                         .append("password", password);
                 // Thêm Document vào bảng
                 collection.insertOne(document);
-            } 
-            catch (MongoException ex) {
+                // Sau khi thêm thành công, cập nhật lại dữ liệu trong bảng chính
+                User user = new User(username, fullName, password);
+                formAccount.addUserToListAndTable(user);
+            } catch (MongoException ex) {
                 JOptionPane.showMessageDialog(AddUserForm.this, "Lỗi khi cập nhật người dùng: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
 
@@ -335,6 +352,15 @@ class AddUserForm extends JFrame {
             setVisible(false);
         });
         
+        // Thêm sự kiện WindowListener để xử lý việc đóng form
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                // Hiển thị thông báo yêu cầu nhấn nút "Đóng" để đóng form
+                JOptionPane.showMessageDialog(AddUserForm.this, "Vui lòng nhấn nút 'Đóng' để đóng form.", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+
         // Tạo panel và thêm các thành phần vào panel
         JPanel panel1 = new JPanel(new GridLayout(5, 2));
         panel1.add(lblUsername);
@@ -356,6 +382,7 @@ class AddUserForm extends JFrame {
 }
 
 class EditUserForm extends JFrame {
+
     private JTextField txtUsername;
     private JTextField txtFullName;
     private JPasswordField txtPassword;
@@ -367,6 +394,7 @@ class EditUserForm extends JFrame {
 
         setTitle("Chỉnh sửa người dùng");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setSize(300, 200);
         setLocationRelativeTo(null);
 
@@ -393,28 +421,33 @@ class EditUserForm extends JFrame {
             String fullName = txtFullName.getText();
             String password = new String(txtPassword.getPassword());
             String confirmPassword = new String(txtConfirmPassword.getPassword());
-            
+
             if (username.isEmpty() || fullName.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
                 JOptionPane.showMessageDialog(EditUserForm.this, "Vui lòng điền đầy đủ thông tin.", "Lỗi", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            
+
             if (!password.equals(confirmPassword)) {
                 JOptionPane.showMessageDialog(EditUserForm.this, "Mật khẩu và xác nhận mật khẩu không khớp.", "Lỗi", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            
+
             // Thực hiện cập nhật thông tin người dùng trong cơ sở dữ liệu
             try {
                 // Code cập nhật thông tin người dùng vào cơ sở dữ liệu tại đây
-                
+
                 // Hiển thị thông báo thành công
                 JOptionPane.showMessageDialog(EditUserForm.this, "Cập nhật người dùng thành công!");
-                
+
                 setVisible(false);
             } catch (HeadlessException ex) {
                 JOptionPane.showMessageDialog(EditUserForm.this, "Lỗi khi cập nhật người dùng: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
+        });
+
+        JButton btnClose = new JButton("Đóng");
+        btnClose.addActionListener((ActionEvent e) -> {
+            setVisible(false);
         });
 
         // Tạo panel và thêm các thành phần vào panel
@@ -428,10 +461,66 @@ class EditUserForm extends JFrame {
         panel.add(lblConfirmPassword);
         panel.add(txtConfirmPassword);
         panel.add(btnSave);
+        panel.add(btnClose);
 
         // Thêm panel vào frame
         add(panel);
 
         setVisible(true);
+    }
+}
+
+class User {
+
+    private String username;
+    private String fullName;
+    private String password;
+
+    public User(String username, String fullName, String password) {
+        this.username = username;
+        this.fullName = fullName;
+        this.password = password;
+    }
+
+    // Getters and setters
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    @Override
+    public String toString() {
+        return "User{"
+                + "username='" + username + '\''
+                + ", fullName='" + fullName + '\''
+                + ", password='" + password + '\''
+                + '}';
+    }
+
+    public Map<String, String> toMap() {
+        Map<String, String> userData = new HashMap<>();
+        userData.put("username", username);
+        userData.put("fullName", fullName);
+        userData.put("password", password);
+        return userData;
     }
 }

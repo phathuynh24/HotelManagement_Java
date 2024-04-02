@@ -34,6 +34,7 @@ com\myproject\swings\PanelBorder.class
 com\myproject\models\Model_Menu$MenuType.class
 com\myproject\components\Menu.class
 com\myproject\models\types\EmployeeStatus.class
+com\myproject\forms\User.class
 com\myproject\components\Header.class
 com\myproject\forms\Form_Home.class
 com\myproject\forms\Form_Goods.class
