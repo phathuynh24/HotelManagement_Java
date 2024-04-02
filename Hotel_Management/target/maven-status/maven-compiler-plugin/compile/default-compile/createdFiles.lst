@@ -55,4 +55,6 @@ com\myproject\swings\ListMenu$2.class
 com\myproject\login\Login$1.class
 com\myproject\events\EventMenuSelected.class
 com\myproject\forms\Form_Account$1.class
+com\myproject\forms\CheckboxEditor.class
+com\myproject\forms\CheckboxRenderer.class
 com\myproject\hotel_management\Hotel_Management.class
