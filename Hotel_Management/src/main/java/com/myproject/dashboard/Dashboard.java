@@ -1,7 +1,7 @@
 package com.myproject.dashboard;
 
 import com.myproject.events.EventMenuSelected;
-import com.myproject.forms.Form_1;
+import com.myproject.forms.reservation.Form_Reservation;
 import com.myproject.forms.Form_2;
 import com.myproject.forms.Form_Goods;
 import com.myproject.forms.Form_Room;
@@ -15,7 +15,7 @@ import javax.swing.JComponent;
 public class Dashboard extends javax.swing.JFrame {
 
     private Form_Home home;
-    private Form_1 form1;
+    private Form_Reservation form1;
     private Form_2 form2;
     private Form_Goods form3;
     private Form_Room form4;
@@ -28,7 +28,7 @@ public class Dashboard extends javax.swing.JFrame {
         initComponents();
         setBackground(new Color(0, 0, 0, 0));
         home = new Form_Home();
-        form1 = new Form_1();
+        form1 = new Form_Reservation();
         form2 = new Form_2();
         form3 = new Form_Goods();
         form4 = new Form_Room();
