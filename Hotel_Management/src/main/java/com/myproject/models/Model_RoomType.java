@@ -36,10 +36,4 @@ public class Model_RoomType {
     public void setMaxOccupancy(int maxOccupancy) {
         this.maxOccupancy = maxOccupancy;
     }
-
-//    public void displayInfo() {
-//        System.out.println("Room type: " + typeName);
-//        System.out.println("Price per night: $" + pricePerNight);
-//        System.out.println("Max occupancy: " + maxOccupancy);
-//    }
 }

@@ -42,8 +42,6 @@ public class Card extends javax.swing.JPanel {
         lbDescription.setText(data.getDescription());
     }
 
-    @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         lbIcon = new javax.swing.JLabel();
@@ -91,7 +89,7 @@ public class Card extends javax.swing.JPanel {
                 .addComponent(lbDescription)
                 .addContainerGap(25, Short.MAX_VALUE))
         );
-    }// </editor-fold>//GEN-END:initComponents
+    }
 
     @Override
     protected void paintComponent(Graphics grphcs) {
@@ -106,10 +104,8 @@ public class Card extends javax.swing.JPanel {
         super.paintComponent(grphcs);
     }
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel lbDescription;
     private javax.swing.JLabel lbIcon;
     private javax.swing.JLabel lbTitle;
     private javax.swing.JLabel lbValues;
-    // End of variables declaration//GEN-END:variables
 }

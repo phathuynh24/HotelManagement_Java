@@ -4,9 +4,10 @@ import com.myproject.events.EventMenuSelected;
 import com.myproject.forms.Form_1;
 import com.myproject.forms.Form_2;
 import com.myproject.forms.Form_Goods;
-import com.myproject.forms.Form_4;
-import com.myproject.forms.Form_5;
-import com.myproject.forms.Form_Account;
+import com.myproject.forms.Form_Room;
+import com.myproject.forms.Form_RoomType;
+import com.myproject.forms.Form_Customer;
+import com.myproject.forms.account.Form_Account;
 import com.myproject.forms.Form_Home;
 import java.awt.Color;
 import javax.swing.JComponent;
@@ -17,8 +18,9 @@ public class Dashboard extends javax.swing.JFrame {
     private Form_1 form1;
     private Form_2 form2;
     private Form_Goods form3;
-    private Form_4 form4;
-    private Form_5 form5;
+    private Form_Room form4;
+    private Form_RoomType form5;
+    private Form_Customer formCustomer;
     private Form_Account formAccount;
 
 
@@ -29,8 +31,9 @@ public class Dashboard extends javax.swing.JFrame {
         form1 = new Form_1();
         form2 = new Form_2();
         form3 = new Form_Goods();
-        form4 = new Form_4();
-        form5 = new Form_5();
+        form4 = new Form_Room();
+        form5 = new Form_RoomType();
+        formCustomer = new Form_Customer();
         formAccount = new Form_Account();
 
         menu.initMoving(Dashboard.this);
@@ -44,8 +47,9 @@ public class Dashboard extends javax.swing.JFrame {
                     case 5 -> setForm(form3);
                     case 9 -> setForm(form4);
                     case 10 -> setForm(form5);
-                    case 11 -> setForm(formAccount);
-
+                    case 11 -> setForm(formCustomer);
+                    case 12 -> setForm(formAccount);
+                    
                     default -> {
                     }
                 }
