@@ -53,8 +53,11 @@ public class Form_Reservation extends JPanel {
         JMenuItem menuItem1 = new JMenuItem("Đặt phòng");
         menuItem1.setIcon(new ImageIcon(getClass().getResource("/com/myproject/icons/7.png")));
         menuItem1.addActionListener(e -> {
-            BookingForm bookingForm = new BookingForm();
-            bookingForm.setVisible(true);
+//            BookingForm bookingForm = new BookingForm();
+//            bookingForm.setVisible(true);
+
+              BookingGroupForm bookingGroupForm = new BookingGroupForm();
+              bookingGroupForm.setVisible(true);
         });
 
         JMenuItem menuItem2 = new JMenuItem("Cập nhật Sản phẩm - Dịch vụ");

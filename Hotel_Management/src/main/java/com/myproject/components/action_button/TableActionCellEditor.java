@@ -8,10 +8,19 @@ import javax.swing.JTable;
 public class TableActionCellEditor extends DefaultCellEditor {
 
     private TableActionEvent event;
+    private boolean isEditButtonVisible;
+    private boolean isDeleteButtonVisible;
+    private boolean isViewButtonVisible;
 
     public TableActionCellEditor(TableActionEvent event) {
         super(new JCheckBox());
         this.event = event;
+    }
+
+    public void setButtonVisibility(boolean isEditButtonVisible, boolean isDeleteButtonVisible, boolean isViewButtonVisible) {
+        this.isEditButtonVisible = isEditButtonVisible;
+        this.isDeleteButtonVisible = isDeleteButtonVisible;
+        this.isViewButtonVisible = isViewButtonVisible;
     }
 
     @Override
@@ -19,6 +28,9 @@ public class TableActionCellEditor extends DefaultCellEditor {
         PanelAction action = new PanelAction();
         action.initEvent(event, row);
         action.setBackground(jtable.getSelectionBackground());
+        action.setEditButtonVisible(isEditButtonVisible);
+        action.setDeleteButtonVisible(isDeleteButtonVisible);
+        action.setViewButtonVisible(isViewButtonVisible);
         return action;
     }
 }

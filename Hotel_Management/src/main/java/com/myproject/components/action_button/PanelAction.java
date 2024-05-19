@@ -5,6 +5,10 @@ import java.awt.event.ActionListener;
 
 public class PanelAction extends javax.swing.JPanel {
 
+    private boolean isEditButtonVisible = true;
+    private boolean isDeleteButtonVisible = true;
+    private boolean isViewButtonVisible = true;
+
     public PanelAction() {
         initComponents();
     }
@@ -30,18 +34,35 @@ public class PanelAction extends javax.swing.JPanel {
         });
     }
 
+    public void setEditButtonVisible(boolean visible) {
+        isEditButtonVisible = visible;
+        cmdEdit.setVisible(visible);
+    }
+
+    public void setDeleteButtonVisible(boolean visible) {
+        isDeleteButtonVisible = visible;
+        cmdDelete.setVisible(visible);
+    }
+
+    public void setViewButtonVisible(boolean visible) {
+        isViewButtonVisible = visible;
+        cmdView.setVisible(visible);
+    }
+
     private void initComponents() {
 
         cmdEdit = new ActionButton();
         cmdDelete = new ActionButton();
         cmdView = new ActionButton();
 
-        cmdEdit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/myproject/icons/edit.png"))); // NOI18N
+        cmdEdit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/myproject/icons/edit.png")));
+        cmdDelete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/myproject/icons/delete.png")));
+        cmdView.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/myproject/icons/view.png")));
 
-        cmdDelete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/myproject/icons/delete.png"))); // NOI18N
-
-        cmdView.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/myproject/icons/view.png"))); // NOI18N
-
+        cmdEdit.setPreferredSize(new java.awt.Dimension(20, 20));
+        cmdDelete.setPreferredSize(new java.awt.Dimension(20, 20));
+        cmdView.setPreferredSize(new java.awt.Dimension(20, 20));
+        
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -49,9 +70,7 @@ public class PanelAction extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(cmdEdit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cmdDelete, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cmdView, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );

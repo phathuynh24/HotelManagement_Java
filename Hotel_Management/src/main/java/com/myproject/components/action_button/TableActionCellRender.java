@@ -7,11 +7,26 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 public class TableActionCellRender extends DefaultTableCellRenderer {
 
+    private boolean isEditButtonVisible = true;
+    private boolean isDeleteButtonVisible = true;
+    private boolean isViewButtonVisible = true;
+
+    public void setButtonVisibility(boolean editVisible, boolean deleteVisible, boolean viewVisible) {
+        isEditButtonVisible = editVisible;
+        isDeleteButtonVisible = deleteVisible;
+        isViewButtonVisible = viewVisible;
+    }
+
     @Override
-    public Component getTableCellRendererComponent(JTable jtable, Object o, boolean isSeleted, boolean bln1, int row, int column) {
-        Component com = super.getTableCellRendererComponent(jtable, o, isSeleted, bln1, row, column);
+    public Component getTableCellRendererComponent(JTable jtable, Object o, boolean isSelected, boolean hasFocus, int row, int column) {
+        Component com = super.getTableCellRendererComponent(jtable, o, isSelected, hasFocus, row, column);
+        
         PanelAction action = new PanelAction();
-        if (isSeleted == false && row % 2 == 0) {
+        action.setEditButtonVisible(isEditButtonVisible);
+        action.setDeleteButtonVisible(isDeleteButtonVisible);
+        action.setViewButtonVisible(isViewButtonVisible);
+        
+        if (isSelected == false && row % 2 == 0) {
             action.setBackground(Color.WHITE);
         } else {
             action.setBackground(com.getBackground());

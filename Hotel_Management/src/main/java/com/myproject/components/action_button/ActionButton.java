@@ -37,8 +37,8 @@ public class ActionButton extends JButton {
         int width = getWidth();
         int height = getHeight();
         int size = Math.min(width, height);
-        int x = (width - size) / 2;
-        int y = (height - size) / 2;
+        double x = (width - size) / 2;
+        double y = (height - size) / 2;
         if (mousePress) {
             g2.setColor(new Color(158, 158, 158));
         } else {
