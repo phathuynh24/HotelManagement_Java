@@ -6,20 +6,20 @@ public class Model_Customer {
     private String gender;
     private String phoneNumber;
     private String idCard;
-    private String doB;
+    private String address;
 
     public Model_Customer() {
         // Default constructor
     }
 
     public Model_Customer(String customerId, String name, String gender, String phoneNumber, String idCard,
-            String doB) {
+            String address) {
         this.customerId = customerId;
         this.name = name;
         this.gender = gender;
         this.phoneNumber = phoneNumber;
         this.idCard = idCard;
-        this.doB = doB;
+        this.address = address;
     }
 
     public String getCustomerId() {
@@ -62,17 +62,17 @@ public class Model_Customer {
         this.idCard = idCard;
     }
 
-    public String getDoB() {
-        return doB;
+    public String getAddress() {
+        return address;
     }
 
-    public void setDoB(String doB) {
-        this.doB = doB;
+    public void setAddress(String doB) {
+        this.address = doB;
     }
 
     @Override
     public String toString() {
         return "Model_Customer [customerId=" + customerId + ", name=" + name + ", gender=" + gender
-                + ", phoneNumber=" + phoneNumber + ", idCard=" + idCard + ", doB=" + doB + "]";
+                + ", phoneNumber=" + phoneNumber + ", idCard=" + idCard + ", address=" + address + "]";
     }
 }
