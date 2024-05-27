@@ -8,10 +8,10 @@ public class Model_Room {
     private RoomStatus status;
     private int capacity;
 
-    public Model_Room(String roomId, Model_RoomType roomType, int capacity) {
+    public Model_Room(String roomId, Model_RoomType roomType, int capacity, RoomStatus status) {
         this.roomId = roomId;
         this.roomType = roomType;
-        this.status = RoomStatus.AVAILABLE;
+        this.status = status;
         this.capacity = capacity;
     }
 

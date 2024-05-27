@@ -35,9 +35,11 @@ import org.jdatepicker.impl.UtilDateModel;
 public class BookingForm extends JFrame {
 
     // Test
-    private Model_RoomType roomType = new Model_RoomType(RoomType.SINGLE, 1500000, 1);
-    private Model_Room room = new Model_Room("101", roomType, 1);
+//    private Model_RoomType roomType = new Model_RoomType(RoomType.SINGLE, 1500000, 1);
+//    private Model_Room room = new Model_Room("101", roomType, 1);
 
+    private Model_Room room;
+    
     private double serviceMoney; // Số tiền dịch vụ thật
     private double roomMoney; // Số tiền phòng thật
     private double totalMoney; // Tổng số tiền thanh toán
@@ -56,8 +58,8 @@ public class BookingForm extends JFrame {
     private JTable serviceTable = new JTable();
     private JTable productListTable = new JTable();
 
-    public BookingForm() {
-//        this.room = room;
+    public BookingForm(Model_Room room) {
+        this.room = room;
         serviceMoney = 0; // Số tiền dịch vụ thật
         roomMoney = room.getPrice(); // Số tiền phòng thật
         totalMoney = roomMoney + serviceMoney; // Tổng số tiền thanh toán
@@ -235,9 +237,9 @@ public class BookingForm extends JFrame {
         spinnerSoNguoi.addChangeListener((ChangeEvent e) -> {
             int soNguoi = (int) spinnerSoNguoi.getValue();
 
-            if (soNguoi > roomType.getMaxOccupancy()) {
+            if (soNguoi > room.getCapacity()) {
                 JOptionPane.showMessageDialog(null, "Quá số người quy định của phòng!");
-                spinnerSoNguoi.setValue(roomType.getMaxOccupancy()); // Đặt lại giá trị thành sức chứa tối đa
+                spinnerSoNguoi.setValue(room.getCapacity()); // Đặt lại giá trị thành sức chứa quy định
             }
         });
 
