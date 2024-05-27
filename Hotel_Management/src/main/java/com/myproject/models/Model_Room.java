@@ -8,10 +8,10 @@ public class Model_Room {
     private RoomStatus status;
     private int capacity;
 
-    public Model_Room(String roomId, Model_RoomType roomType, RoomStatus status, int capacity) {
+    public Model_Room(String roomId, Model_RoomType roomType, int capacity) {
         this.roomId = roomId;
         this.roomType = roomType;
-        this.status = status;
+        this.status = RoomStatus.AVAILABLE;
         this.capacity = capacity;
     }
 
@@ -29,6 +29,14 @@ public class Model_Room {
 
     public void setRoomType(Model_RoomType roomType) {
         this.roomType = roomType;
+    }
+    
+    public double getPrice() {
+        return roomType.getPricePerNight();
+    }
+    
+    public String getPriceFormated() {
+        return roomType.getPricePerNightFormated();
     }
 
     public int getCapacity() {

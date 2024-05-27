@@ -9,6 +9,7 @@ com\myproject\components\Card.class
 com\myproject\forms\account\Form_Account$2.class
 com\myproject\swings\Table$2.class
 com\myproject\forms\account\CheckboxCellHandler$CheckboxRenderer.class
+com\myproject\models\Model_Service.class
 com\myproject\forms\reservation\BookingForm$1.class
 com\myproject\forms\reservation\BookingGroupForm.class
 com\myproject\components\Menu$1.class
@@ -89,6 +90,7 @@ com\myproject\forms\reservation\CustomerForm.class
 com\myproject\forms\Form_Goods.class
 com\myproject\models\types\RoomStatus.class
 com\myproject\forms\account\Form_Account$1.class
+com\myproject\models\Model_Invoice.class
 com\myproject\models\Model_Employee.class
 com\myproject\swings\ListMenu$3.class
 com\myproject\forms\reservation\BookingGroupForm$5.class
@@ -104,6 +106,7 @@ com\myproject\swings\GoodsTable.class
 com\myproject\forms\Form_Home$1.class
 com\myproject\swings\ModernScrollBarUI.class
 com\myproject\forms\Form_Customer.class
+com\myproject\models\Model_Product.class
 com\myproject\forms\reservation\BookingGroupForm$4.class
 com\myproject\forms\Form_Goods$6.class
 com\myproject\forms\reservation\BookingGroupForm$3.class

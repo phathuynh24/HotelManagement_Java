@@ -1,6 +1,7 @@
 package com.myproject.models;
 
 import com.myproject.models.types.RoomType;
+import java.text.DecimalFormat;
 
 public class Model_RoomType {
     private RoomType typeName;
@@ -23,6 +24,11 @@ public class Model_RoomType {
 
     public double getPricePerNight() {
         return pricePerNight;
+    }
+    
+    public String getPricePerNightFormated() {
+        DecimalFormat decimalFormat = new DecimalFormat("#,###");
+        return decimalFormat.format(pricePerNight);
     }
 
     public void setPricePerNight(double pricePerNight) {

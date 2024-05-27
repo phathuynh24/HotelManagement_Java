@@ -4,48 +4,108 @@ import com.myproject.components.action_button.CustomTableCellRenderer;
 import com.myproject.components.action_button.TableActionCellEditor;
 import com.myproject.components.action_button.TableActionCellRender;
 import com.myproject.components.action_button.TableActionEvent;
+import com.myproject.models.Model_Room;
+import com.myproject.models.Model_RoomType;
+import com.myproject.models.types.RoomType;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
+import java.util.Date;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.JDatePickerImpl;
-import org.jdatepicker.impl.SqlDateModel;
 import java.util.Properties;
+import javax.swing.event.ChangeEvent;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.TableColumn;
+import org.jdatepicker.impl.UtilDateModel;
 
 public class BookingForm extends JFrame {
 
+    // Test
+    private Model_RoomType roomType = new Model_RoomType(RoomType.SINGLE, 1500000, 1);
+    private Model_Room room = new Model_Room("101", roomType, 1);
+
+    private double serviceMoney; // Số tiền dịch vụ thật
+    private double roomMoney; // Số tiền phòng thật
+    private double totalMoney; // Tổng số tiền thanh toán
+
+    private JLabel serviceAmount;
+    private JLabel roomAmount;
+    private JLabel totalAmount;
+
+    // Khởi tạo mẫu cho JDatePicker
+    private UtilDateModel dateModelNgayDat = new UtilDateModel();
+    private UtilDateModel dateModelNgayTra = new UtilDateModel();
+
+    private JDatePickerImpl datePickerNgayDat;
+    private JDatePickerImpl datePickerNgayTra;
+
+    private JTable serviceTable = new JTable();
+    private JTable productListTable = new JTable();
+
     public BookingForm() {
+//        this.room = room;
+        serviceMoney = 0; // Số tiền dịch vụ thật
+        roomMoney = room.getPrice(); // Số tiền phòng thật
+        totalMoney = roomMoney + serviceMoney; // Tổng số tiền thanh toán
+
+        dateModelNgayDat.setValue(new Date());
+
         initComponents();
+
+        updateServiceAmount();
+        updateRoomAmount();
+        updateTotalAmount();
+
+    }
+
+    private void updateServiceAmount() {
+        serviceMoney = 0;
+        int rowCount = productListTable.getRowCount();
+        int columnNumber = 4; // Số cột bắt đầu từ 0, ở đây chọn cột số 5
+
+        for (int row = 0; row < rowCount; row++) {
+            double amount = Double.parseDouble(productListTable.getValueAt(row, columnNumber).toString());
+            serviceMoney += amount;
+        }
+
+        DecimalFormat decimalFormat = new DecimalFormat("#,###");
+        serviceAmount.setText(decimalFormat.format(serviceMoney) + " VNĐ");
+
+    }
+
+    private void updateRoomAmount() {
+        DecimalFormat decimalFormat = new DecimalFormat("#,###");
+        roomAmount.setText(decimalFormat.format(roomMoney) + " VNĐ");
+    }
+
+    private void updateTotalAmount() {
+        this.totalMoney = roomMoney + serviceMoney;
+        DecimalFormat decimalFormat = new DecimalFormat("#,###");
+        totalAmount.setText(decimalFormat.format(totalMoney) + " VNĐ");
     }
 
     private void initComponents() {
-        JTable serviceTable;
-        JTable productListTable;
-        productListTable = new JTable();
         String[] productListColumns = {"PHÒNG", "TÊN SP - DV", "SL", "ĐƠN GIÁ", "THÀNH TIỀN", "XÓA"};
-        Object[][] productListData = {
-            {"Phòng 107", "Redbull", "2", "20000", "40000"},
-            {"Phòng 107", "Cam ép", "1", "15000", "15000"}
-        };
+        Object[][] productListData = {};
 
         DefaultTableModel productListTableModel = new DefaultTableModel(productListData, productListColumns) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return column == 2 || column == 5; // Cho phép chỉnh sửa cột SL và cột Xóa
-            }
-
-            public void moveColumn(int column, int targetColumn) {
-                throw new UnsupportedOperationException("Thay đổi vị trí cột không được hỗ trợ.");
             }
         };
 
@@ -66,23 +126,22 @@ public class BookingForm extends JFrame {
                     productListTable.getCellEditor().stopCellEditing();
                 }
                 productListTableModel.removeRow(row);
+
+                updateServiceAmount();
+                updateTotalAmount();
             }
         };
 
-        setTitle(
-                "Đặt phòng khách lẻ");
-        setSize(
-                1000, 600);
+        setTitle("Đặt phòng khách lẻ");
+        setSize(1000, 700);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        setLayout(
-                new BorderLayout());
+        setLayout(new BorderLayout());
 
         // Main panel with padding
         JPanel mainPanel = new JPanel(new BorderLayout());
 
-        mainPanel.setBorder(
-                new EmptyBorder(10, 10, 10, 10));
+        mainPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
         // Panel thông tin khách hàng
         JPanel customerInfoPanel = new JPanel(new GridBagLayout());
@@ -90,10 +149,49 @@ public class BookingForm extends JFrame {
                 BorderFactory.createLineBorder(Color.BLACK), "Thông tin khách hàng",
                 TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION,
                 new Font("SansSerif", Font.BOLD, 14), Color.RED);
-
         titledCustomer.setTitleColor(Color.RED); // Thiết lập màu đỏ cho tiêu đề
 
         customerInfoPanel.setBorder(titledCustomer);
+
+        GridBagConstraints gbcCustomer = new GridBagConstraints();
+        gbcCustomer.insets = new Insets(5, 5, 5, 5);
+        gbcCustomer.anchor = GridBagConstraints.WEST;
+
+        // Panel chứa roomInfo
+        JPanel roomInfoPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        roomInfoPanel.setOpaque(true);
+
+        JLabel roomInfo = new JLabel("Phòng " + room.getRoomId() + " - Giá cả: " + room.getPriceFormated() + " VNĐ");
+        roomInfo.setForeground(Color.MAGENTA);
+        roomInfo.setFont(new Font("SansSerif", Font.BOLD, 16));
+
+        // Căn giữa theo chiều ngang
+        GridBagConstraints gbcRoomInfo = new GridBagConstraints();
+        gbcRoomInfo.gridx = 0;
+        gbcRoomInfo.gridy = 0;
+        gbcCustomer.gridwidth = 3;
+        gbcRoomInfo.anchor = GridBagConstraints.CENTER;
+        gbcRoomInfo.fill = GridBagConstraints.HORIZONTAL;
+
+        roomInfoPanel.add(roomInfo, gbcRoomInfo);
+
+        // Panel chứa các thông tin khách hàng khác
+        JPanel customerFieldsPanel = new JPanel(new GridBagLayout());
+        customerFieldsPanel.setOpaque(false);
+
+        // Adding roomInfoPanel to customerInfoPanel
+        gbcCustomer.gridx = 0;
+        gbcCustomer.gridy = 0;
+        gbcCustomer.gridwidth = 3;
+        gbcCustomer.fill = GridBagConstraints.HORIZONTAL;
+        customerInfoPanel.add(roomInfoPanel, gbcCustomer);
+
+        // Adding customerFieldsPanel to customerInfoPanel
+        gbcCustomer.gridx = 0;
+        gbcCustomer.gridy = 1;
+        gbcCustomer.gridwidth = 3;
+        gbcCustomer.fill = GridBagConstraints.NONE;
+        customerInfoPanel.add(customerFieldsPanel, gbcCustomer);
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -101,30 +199,61 @@ public class BookingForm extends JFrame {
 
         Dimension size = new Dimension(150, 25);
 
-        // Date pickers for "Ngày đặt" and "Ngày trả"
-        JDatePickerImpl datePickerNgayDat = createDatePicker();
-        JDatePickerImpl datePickerNgayTra = createDatePicker();
+        // Tạo các JDatePickerImpl cho ngày đặt và ngày trả
+        datePickerNgayDat = createDatePicker(dateModelNgayDat, true);
+        datePickerNgayTra = createDatePicker(dateModelNgayTra, false);
+
+        // Thêm PropertyChangeListener cho datePickerNgayDat
+        datePickerNgayDat.getJFormattedTextField().addPropertyChangeListener("value", evt -> {
+            // Lấy ngày đặt và ngày trả từ JDatePickerImpl
+            Date ngayDat = (Date) datePickerNgayDat.getModel().getValue();
+            Date ngayTra = (Date) datePickerNgayTra.getModel().getValue();
+
+            // Kiểm tra ngày trả
+            if (ngayTra != null && ngayTra.before(ngayDat)) {
+                // Ngày trả phải sau ngày đặt
+                JOptionPane.showMessageDialog(null, "Ngày trả phòng phải sau ngày đặt.");
+            }
+        });
+
+        // Thêm PropertyChangeListener cho datePickerNgayTra
+        datePickerNgayTra.getJFormattedTextField().addPropertyChangeListener("value", evt -> {
+            // Lấy ngày đặt và ngày trả từ JDatePickerImpl
+            Date ngayDat = (Date) datePickerNgayDat.getModel().getValue();
+            Date ngayTra = (Date) datePickerNgayTra.getModel().getValue();
+
+            // Kiểm tra ngày trả
+            if (ngayDat != null && ngayTra != null && ngayTra.before(ngayDat)) {
+                // Ngày trả phải sau ngày đặt
+                JOptionPane.showMessageDialog(null, "Ngày trả phòng phải sau ngày đặt.");
+            }
+        });
 
         // Spinner for "Số lượng người"
         JSpinner spinnerSoNguoi = new JSpinner(new SpinnerNumberModel(1, 1, 150, 1));
-
         spinnerSoNguoi.setPreferredSize(size);
+        spinnerSoNguoi.addChangeListener((ChangeEvent e) -> {
+            int soNguoi = (int) spinnerSoNguoi.getValue();
 
-        // Adding customer information fields
-        addLabelAndField(customerInfoPanel, gbc, "Khách hàng", createComboBox(new String[]{"Khách lẻ",
-             "Khách đoàn", "VIP"}, size
-        ), 0, 0);
-        addLabelAndField(customerInfoPanel, gbc,
+            if (soNguoi > roomType.getMaxOccupancy()) {
+                JOptionPane.showMessageDialog(null, "Quá số người quy định của phòng!");
+                spinnerSoNguoi.setValue(roomType.getMaxOccupancy()); // Đặt lại giá trị thành sức chứa tối đa
+            }
+        });
+
+        // Adding customer information fields to customerFieldsPanel
+        addLabelAndField(customerFieldsPanel, gbc, "Khách hàng", createComboBox(new String[]{"Khách lẻ",
+            "Khách đoàn", "VIP"}, size), 0, 0);
+        addLabelAndField(customerFieldsPanel, gbc,
                 "Ngày đặt", datePickerNgayDat, 1, 0);
-        addLabelAndField(customerInfoPanel, gbc,
+        addLabelAndField(customerFieldsPanel, gbc,
                 "Ghi chú", createTextField("Khách lẻ", size), 2, 0);
-        addLabelAndField(customerInfoPanel, gbc,
+        addLabelAndField(customerFieldsPanel, gbc,
                 "Số người", spinnerSoNguoi, 0, 1);
-        addLabelAndField(customerInfoPanel, gbc,
+        addLabelAndField(customerFieldsPanel, gbc,
                 "Ngày trả", datePickerNgayTra, 1, 1);
-        addLabelAndField(customerInfoPanel, gbc, "Trạng thái", createComboBox(new String[]{"Chưa hoàn tất",
-             "Đã hoàn tất"}, size
-        ), 2, 1);
+        addLabelAndField(customerFieldsPanel, gbc, "Trạng thái", createComboBox(new String[]{"Chưa hoàn tất",
+            "Đã hoàn tất"}, size), 2, 1);
 
         // Panel sản phẩm - dịch vụ
         JPanel servicePanel = new JPanel(new BorderLayout());
@@ -147,17 +276,19 @@ public class BookingForm extends JFrame {
             {"Trà Ô Long", "15000"}
         };
 
-        serviceTable = new JTable(new DefaultTableModel(serviceData, serviceColumns) {
+        DefaultTableModel serviceTableModel = new DefaultTableModel(serviceData, serviceColumns) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false; // Không cho phép chỉnh sửa
             }
-        });
+        };
+
+        serviceTable.setModel(serviceTableModel);
 
         CustomTableCellRenderer heightCellRenderer = new CustomTableCellRenderer(rowHeight);
 
         serviceTable.setDefaultRenderer(Object.class,
-                 heightCellRenderer);
+                heightCellRenderer);
 
         JScrollPane serviceScrollPane = new JScrollPane(serviceTable);
 
@@ -177,21 +308,28 @@ public class BookingForm extends JFrame {
         // Thiết lập trình lắng nghe sự kiện để cập nhật tổng thành tiền khi thay đổi số lượng
         productListTableModel.addTableModelListener(
                 (TableModelEvent e) -> {
-                    if (e.getType() == TableModelEvent.UPDATE && e.getColumn() == 2) {
+                    if (e.getType() == TableModelEvent.UPDATE) {
                         int row = e.getFirstRow();
-                        int quantity = Integer.parseInt(productListTableModel.getValueAt(row, 2).toString());
-                        int price = Integer.parseInt(productListTableModel.getValueAt(row, 3).toString());
-                        int total = quantity * price;
-                        productListTableModel.setValueAt(total, row, 4);
+                        int column = e.getColumn();
+
+                        // Cập nhật thành tiền khi thay đổi số lượng (cột 2)
+                        if (column == 2) {
+                            try {
+                                int quantity = Integer.parseInt(productListTableModel.getValueAt(row, 2).toString());
+                                int price = Integer.parseInt(productListTableModel.getValueAt(row, 3).toString());
+                                int total = quantity * price;
+                                productListTableModel.setValueAt(total, row, 4);
+                            } catch (NumberFormatException ex) {
+                            }
+                        }
                     }
                 }
         );
 
         productListTable.setModel(productListTableModel);
 
-
         productListTable.setDefaultRenderer(Object.class,
-                 heightCellRenderer);
+                heightCellRenderer);
 
         TableActionCellRender cellRenderer = new TableActionCellRender();
         TableActionCellEditor cellEditor = new TableActionCellEditor(event);
@@ -254,51 +392,36 @@ public class BookingForm extends JFrame {
         JPanel totalInfoPanel = new JPanel(new GridLayout(3, 2));
 
         JLabel serviceLabel = new JLabel("Tổng tiền dịch vụ", SwingConstants.LEFT);
-
         serviceLabel.setFont(
                 new Font("Arial", Font.PLAIN, 14));
         totalInfoPanel.add(serviceLabel);
-
-        JLabel serviceAmount = new JLabel("55,000 đồng");
-
+        serviceAmount = new JLabel("");
         serviceAmount.setFont(
                 new Font("Arial", Font.PLAIN, 14));
         serviceAmount.setHorizontalAlignment(JTextField.LEFT); // Căn lề trái cho nội dung trong ô
-
         totalInfoPanel.add(serviceAmount);
 
         JLabel roomLabel = new JLabel("Tổng tiền phòng", SwingConstants.LEFT);
-
         roomLabel.setFont(
                 new Font("Arial", Font.PLAIN, 14));
         totalInfoPanel.add(roomLabel);
-
-        JLabel roomAmount = new JLabel("1,500,000 đồng");
-
+        roomAmount = new JLabel("");
         roomAmount.setFont(
                 new Font("Arial", Font.PLAIN, 14));
         roomAmount.setHorizontalAlignment(JTextField.LEFT); // Căn lề trái cho nội dung trong ô
-
         totalInfoPanel.add(roomAmount);
 
         JLabel totalLabel = new JLabel("Tổng tiền thanh toán", SwingConstants.LEFT);
-
         totalLabel.setForeground(Color.RED); // Màu đỏ cho nhãn
-
         totalLabel.setFont(
                 new Font("Arial", Font.BOLD, 14));
         totalInfoPanel.add(totalLabel);
-
-        JLabel totalAmount = new JLabel("1,535,000 đồng");
-
+        totalAmount = new JLabel("");
         totalAmount.setForeground(Color.RED); // Màu đỏ cho ô
-
         totalAmount.setFont(
                 new Font("Arial", Font.BOLD, 14));
         totalAmount.setHorizontalAlignment(JTextField.LEFT); // Căn lề trái cho nội dung trong ô
-
         totalInfoPanel.add(totalAmount);
-
         totalPanel.add(totalInfoPanel, BorderLayout.CENTER);
 
         // Add panels to main panel with padding
@@ -350,10 +473,14 @@ public class BookingForm extends JFrame {
 
                     if (!productExists) {
                         // Add a new row to the table
-                        Object[] newRow = {"Phòng 107", productName, "1", String.valueOf(price), String.valueOf(price)};
+                        Object[] newRow = {"Phòng " + room.getRoomId(), productName, "1", String.valueOf(price), String.valueOf(price)};
                         leftTableModel.addRow(newRow);
                     }
                 }
+                System.out.println("111112");
+
+                updateServiceAmount();
+                updateTotalAmount();
             }
         }
         );
@@ -385,14 +512,47 @@ public class BookingForm extends JFrame {
         panel.add(field, gbc);
     }
 
-    private JDatePickerImpl createDatePicker() {
-        SqlDateModel model = new SqlDateModel();
+    private JDatePickerImpl createDatePicker(UtilDateModel dateModel, boolean isNgayDat) {
+        if (isNgayDat) {
+            dateModel.setValue(new Date()); // Đặt ngày mặc định là ngày hôm nay cho ngày đặt
+        } else {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(new Date());
+            calendar.add(Calendar.DAY_OF_MONTH, 1); // Cộng 1 ngày từ ngày hiện tại
+            dateModel.setValue(calendar.getTime());
+        }
+
         Properties properties = new Properties();
         properties.put("text.today", "Today");
         properties.put("text.month", "Month");
         properties.put("text.year", "Year");
-        JDatePanelImpl datePanel = new JDatePanelImpl(model, properties);
-        return new JDatePickerImpl(datePanel, new DateLabelFormatter());
+
+        JDatePanelImpl datePanel = new JDatePanelImpl(dateModel, properties);
+        JDatePickerImpl datePicker = new JDatePickerImpl(datePanel, new DateLabelFormatter());
+
+        datePicker.addActionListener((ActionEvent e) -> {
+            updateRoomMoney();
+        });
+
+        return datePicker;
+    }
+
+    private void updateRoomMoney() {
+        Date ngayDatValue = (Date) datePickerNgayDat.getModel().getValue();
+        Date ngayTraValue = (Date) datePickerNgayTra.getModel().getValue();
+
+        if (ngayDatValue != null && ngayTraValue != null) {
+            LocalDate ngayDat = ngayDatValue.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate ngayTra = ngayTraValue.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+            long soDemO = ChronoUnit.DAYS.between(ngayDat, ngayTra);
+            soDemO = Math.max(soDemO, 0); // Đảm bảo số đêm ở không âm
+            soDemO = (soDemO == 0) ? 1 : soDemO; // Đặt số đêm ở thành 1 nếu bằng 0
+
+            roomMoney = soDemO * room.getPrice();
+            updateRoomAmount();
+            updateTotalAmount();
+        }
     }
 
     private class DateLabelFormatter extends JFormattedTextField.AbstractFormatter {

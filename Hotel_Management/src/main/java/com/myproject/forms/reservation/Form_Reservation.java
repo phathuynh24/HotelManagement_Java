@@ -7,6 +7,9 @@ import javax.swing.*;
 
 public class Form_Reservation extends JPanel {
 
+    private BookingForm bookingForm;
+    private BookingGroupForm bookingGroupForm;
+
     public Form_Reservation() {
         initComponents();
     }
@@ -21,14 +24,9 @@ public class Form_Reservation extends JPanel {
             for (int room = 1; room <= 6; room++) {
                 String roomNumber = String.format("Phòng %d%02d", floor, room);
                 JButton roomButton = new JButton(roomNumber);
-                roomButton.setIcon(new ImageIcon(getClass().getResource("/com/myproject/icons/logo.png"))); // Thêm icon nhà bình thường
+                roomButton.setIcon(new ImageIcon(getClass().getResource("/com/myproject/icons/room_1.png")));
                 roomButton.setHorizontalTextPosition(JButton.CENTER);
                 roomButton.setVerticalTextPosition(JButton.BOTTOM);
-
-//                // Kiểm tra nếu phòng là Phòng 202 để thay đổi icon
-//                if (floor == 2 && room == 2) {
-//                    roomButton.setIcon(new ImageIcon(getClass().getResource("/com/myproject/icons/menu.png"))); // Thêm icon nhà màu đỏ
-//                }
 
                 // Thêm menu ngữ cảnh
                 JPopupMenu popupMenu = createContextMenu();
@@ -50,29 +48,43 @@ public class Form_Reservation extends JPanel {
     private JPopupMenu createContextMenu() {
         JPopupMenu popupMenu = new JPopupMenu();
 
-        JMenuItem menuItem1 = new JMenuItem("Đặt phòng");
-        menuItem1.setIcon(new ImageIcon(getClass().getResource("/com/myproject/icons/7.png")));
+        JMenuItem menuItem1 = new JMenuItem("Đặt phòng khách lẻ");
+        menuItem1.setIcon(new ImageIcon(getClass().getResource("/com/myproject/icons/booking.png")));
         menuItem1.addActionListener(e -> {
-//            BookingForm bookingForm = new BookingForm();
-//            bookingForm.setVisible(true);
-
-              BookingGroupForm bookingGroupForm = new BookingGroupForm();
-              bookingGroupForm.setVisible(true);
+            if (bookingForm == null || !bookingForm.isVisible()) {
+                bookingForm = new BookingForm();
+                bookingForm.setVisible(true);
+            } else {
+                JOptionPane.showMessageDialog(null, "Form Đặt phòng khách lẻ đã được mở.");
+            }
         });
 
-        JMenuItem menuItem2 = new JMenuItem("Cập nhật Sản phẩm - Dịch vụ");
-        menuItem2.setIcon(new ImageIcon(getClass().getResource("/com/myproject/icons/7.png")));
+        JMenuItem menuItem2 = new JMenuItem("Đặt phòng theo đoàn");
+        menuItem2.setIcon(new ImageIcon(getClass().getResource("/com/myproject/icons/booking_group.png")));
+        menuItem2.addActionListener(e -> {
+            if (bookingGroupForm == null || !bookingGroupForm.isVisible()) {
+                bookingGroupForm = new BookingGroupForm();
+                bookingGroupForm.setVisible(true);
+            }
+            else {
+                JOptionPane.showMessageDialog(null, "Form Đặt phòng theo đoàn đã được mở.");
+            }
+        });
 
-        JMenuItem menuItem3 = new JMenuItem("Chuyển phòng");
-        menuItem3.setIcon(new ImageIcon(getClass().getResource("/com/myproject/icons/7.png")));
+        JMenuItem menuItem3 = new JMenuItem("Cập nhật Sản phẩm - Dịch vụ");
+        menuItem3.setIcon(new ImageIcon(getClass().getResource("/com/myproject/icons/update.png")));
 
-        JMenuItem menuItem4 = new JMenuItem("Thanh toán");
-        menuItem4.setIcon(new ImageIcon(getClass().getResource("/com/myproject/icons/7.png")));
+        JMenuItem menuItem4 = new JMenuItem("Chuyển phòng");
+        menuItem4.setIcon(new ImageIcon(getClass().getResource("/com/myproject/icons/room_transfer.png")));
+
+        JMenuItem menuItem5 = new JMenuItem("Thanh toán");
+        menuItem5.setIcon(new ImageIcon(getClass().getResource("/com/myproject/icons/payment.png")));
 
         popupMenu.add(menuItem1);
         popupMenu.add(menuItem2);
         popupMenu.add(menuItem3);
         popupMenu.add(menuItem4);
+        popupMenu.add(menuItem5);
 
         return popupMenu;
     }

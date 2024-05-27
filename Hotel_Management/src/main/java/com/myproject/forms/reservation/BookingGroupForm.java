@@ -4,9 +4,9 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import javax.swing.table.DefaultTableCellRenderer;
 
 public class BookingGroupForm extends JFrame {
 
@@ -22,30 +22,38 @@ public class BookingGroupForm extends JFrame {
     private JComboBox<String> customerComboBox;
 
     // Dữ liệu phòng theo tầng
-    private String[] roomColumnNames = {"TẦNG", "TÊN PHÒNG", "ĐƠN GIÁ", "SỐ PHÒNG TRỐNG"};
+    private String[] roomColumnNames = {"TÊN PHÒNG", "ĐƠN GIÁ"};
     private Object[][] roomData = {
-            {"Tầng 1", "Phòng 101", 3500000, 7},
-            {"Tầng 1", "Phòng 102", 3000000, 7},
-            {"Tầng 1", "Phòng 103", 2500000, 7},
-            {"Tầng 1", "Phòng 104", 3500000, 7},
-            {"Tầng 1", "Phòng 105", 1500000, 7},
-            {"Tầng 1", "Phòng 106", 1500000, 7},
-            {"Tầng 1", "Phòng 107", 1500000, 7},
-            {"Tầng 2", "Phòng 201", 2500000, 5},
-            {"Tầng 2", "Phòng 203", 3500000, 5},
-            {"Tầng 2", "Phòng 204", 3500000, 5},
-            {"Tầng 2", "Phòng 205", 3500000, 5},
-            {"Tầng 2", "Phòng 206", 3000000, 5},
-            {"Tầng 3", "Phòng 301", 3000000, 5},
-            {"Tầng 3", "Phòng 302", 2500000, 5},
-            {"Tầng 3", "Phòng 303", 2500000, 5},
-            {"Tầng 3", "Phòng 304", 2500000, 5},
-            {"Tầng 3", "Phòng 305", 2500000, 5},
-            {"Tầng 4", "Phòng 401", 2500000, 5},
-            {"Tầng 4", "Phòng 402", 2500000, 5},
-            {"Tầng 4", "Phòng 403", 1500000, 5},
-            {"Tầng 4", "Phòng 404", 1500000, 5},
-            {"Tầng 4", "Phòng 405", 1500000, 5}
+        // Tầng 1
+        {"Tầng 1", "", "", "Tầng 1"},
+        {"Phòng 101", 3500000, "Trống", "Tầng 1"},
+        {"Phòng 102", 3000000, "Trống", "Tầng 1"},
+        {"Phòng 103", 2500000, "Đã đặt", "Tầng 1"},
+        {"Phòng 104", 3500000, "Đã đặt", "Tầng 1"},
+        {"Phòng 105", 1500000, "Trống", "Tầng 1"},
+        {"Phòng 106", 1500000, "Trống", "Tầng 1"},
+        {"Phòng 107", 1500000, "Đã đặt", "Tầng 1"},
+        // Tầng 2
+        {"Tầng 2", "", "", "Tầng 2"},
+        {"Phòng 201", 2500000, "Trống", "Tầng 2"},
+        {"Phòng 203", 3500000, "Trống", "Tầng 2"},
+        {"Phòng 204", 3500000, "Đã đặt", "Tầng 2"},
+        {"Phòng 205", 3500000, "Trống", "Tầng 2"},
+        {"Phòng 206", 3000000, "Đã đặt", "Tầng 2"},
+        // Tầng 3
+        {"Tầng 3", "", "", "Tầng 3"},
+        {"Phòng 301", 3000000, "Trống", "Tầng 3"},
+        {"Phòng 302", 2500000, "Trống", "Tầng 3"},
+        {"Phòng 303", 2500000, "Đã đặt", "Tầng 3"},
+        {"Phòng 304", 2500000, "Trống", "Tầng 3"},
+        {"Phòng 305", 2500000, "Trống", "Tầng 3"},
+        // Tầng 4
+        {"Tầng 4", "", "", "Tầng 4"},
+        {"Phòng 401", 2500000, "Trống", "Tầng 4"},
+        {"Phòng 402", 2500000, "Trống", "Tầng 4"},
+        {"Phòng 403", 1500000, "Đã đặt", "Tầng 4"},
+        {"Phòng 404", 1500000, "Trống", "Tầng 4"},
+        {"Phòng 405", 1500000, "Đã đặt", "Tầng 4"}
     };
 
     public BookingGroupForm() {
@@ -63,11 +71,8 @@ public class BookingGroupForm extends JFrame {
 
         // ComboBox chọn tầng
         floorComboBox = new JComboBox<>(new String[]{"Tất cả các tầng", "Tầng 1", "Tầng 2", "Tầng 3", "Tầng 4"});
-        floorComboBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                filterRoomsByFloor();
-            }
+        floorComboBox.addActionListener((ActionEvent e) -> {
+            filterRoomsByFloor();
         });
 
         JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -85,13 +90,47 @@ public class BookingGroupForm extends JFrame {
         };
         roomsTable = new JTable(roomsTableModel);
         roomsTable.addMouseListener(new MouseAdapter() {
+            @Override
             public void mouseClicked(MouseEvent e) {
                 int selectedRow = roomsTable.getSelectedRow();
-                String roomName = (String) roomsTableModel.getValueAt(selectedRow, 1);
-                int roomPrice = (int) roomsTableModel.getValueAt(selectedRow, 2);
-                bookedRoomsTableModel.addRow(new Object[]{roomName, roomPrice});
+                String roomName = (String) roomsTableModel.getValueAt(selectedRow, 0);
+                int roomPrice = (int) roomsTableModel.getValueAt(selectedRow, 1);
+
+                boolean isRoomAlreadySelected = false;
+                for (int i = 0; i < bookedRoomsTableModel.getRowCount(); i++) {
+                    String bookedRoomName = (String) bookedRoomsTableModel.getValueAt(i, 0);
+                    if (bookedRoomName.equals(roomName)) {
+                        isRoomAlreadySelected = true;
+                        break;
+                    }
+                }
+
+                if (isRoomAlreadySelected) {
+                    // Hiển thị thông báo phòng đã chọn
+                    JOptionPane.showMessageDialog(null, "Phòng đã chọn", "Thông báo", JOptionPane.WARNING_MESSAGE);
+                } else {
+                    bookedRoomsTableModel.addRow(new Object[]{roomName, roomPrice});
+                }
             }
         });
+
+        // Custom renderer để hiển thị tầng
+        roomsTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                String roomName = (String) table.getModel().getValueAt(row, 0);
+                if (roomName.startsWith("Tầng")) {
+                    c.setFont(c.getFont().deriveFont(Font.BOLD));
+                    c.setBackground(new Color(220, 220, 220));
+                } else {
+                    c.setFont(c.getFont().deriveFont(Font.PLAIN));
+                    c.setBackground(Color.WHITE);
+                }
+                return c;
+            }
+        });
+
         JScrollPane roomsScrollPane = new JScrollPane(roomsTable);
         leftPanel.add(roomsScrollPane, BorderLayout.CENTER);
 
@@ -152,6 +191,22 @@ public class BookingGroupForm extends JFrame {
         centerPanel.add(new JLabel("Danh sách Sản phẩm - Dịch vụ"));
         centerPanel.add(productsScrollPane);
 
+        // Tiền phòng
+        JPanel roomChargePanel = new JPanel(new BorderLayout());
+        roomChargePanel.add(new JLabel("TIỀN PHÒNG"), BorderLayout.WEST);
+        JTextField roomChargeField = new JTextField("0 đồng");
+        roomChargeField.setEditable(false);
+        roomChargePanel.add(roomChargeField, BorderLayout.CENTER);
+        centerPanel.add(roomChargePanel);
+
+        // Tiền SP-DV
+        JPanel serviceChargePanel = new JPanel(new BorderLayout());
+        serviceChargePanel.add(new JLabel("TIỀN SP-DV"), BorderLayout.WEST);
+        JTextField serviceChargeField = new JTextField("0 đồng");
+        serviceChargeField.setEditable(false);
+        serviceChargePanel.add(serviceChargeField, BorderLayout.CENTER);
+        centerPanel.add(serviceChargePanel);
+
         // Tổng tiền
         JPanel totalPanel = new JPanel(new BorderLayout());
         totalPanel.add(new JLabel("TỔNG THANH TOÁN"), BorderLayout.WEST);
@@ -166,8 +221,8 @@ public class BookingGroupForm extends JFrame {
 
         String[] columnNamesServices = {"TÊN SP - DV", "ĐƠN GIÁ"};
         Object[][] dataServices = {
-                {"Coca Cola", 15000}, {"Nước suối", 12000}, {"Redbull", 20000},
-                {"Fanta", 15000}, {"Cam ép", 15000}, {"Trà Ô Long", 15000}
+            {"Coca Cola", 15000}, {"Nước suối", 12000}, {"Redbull", 20000},
+            {"Fanta", 15000}, {"Cam ép", 15000}, {"Trà Ô Long", 15000}
         };
         servicesTableModel = new DefaultTableModel(dataServices, columnNamesServices) {
             @Override
@@ -177,14 +232,37 @@ public class BookingGroupForm extends JFrame {
         };
         servicesTable = new JTable(servicesTableModel);
         servicesTable.addMouseListener(new MouseAdapter() {
+            @Override
             public void mouseClicked(MouseEvent e) {
                 int selectedRow = servicesTable.getSelectedRow();
                 String serviceName = (String) servicesTableModel.getValueAt(selectedRow, 0);
                 int servicePrice = (int) servicesTableModel.getValueAt(selectedRow, 1);
                 int selectedRoomRow = bookedRoomsTable.getSelectedRow();
+
                 if (selectedRoomRow != -1) {
                     String roomName = (String) bookedRoomsTableModel.getValueAt(selectedRoomRow, 0);
-                    productsTableModel.addRow(new Object[]{roomName, serviceName, 1, servicePrice, servicePrice});
+
+                    boolean isProductAlreadyAdded = false;
+                    int rowIndex = -1;
+                    for (int i = 0; i < productsTableModel.getRowCount(); i++) {
+                        String productName = (String) productsTableModel.getValueAt(i, 1);
+                        if (productName.equals(serviceName) && roomName.equals((String) productsTableModel.getValueAt(i, 0))) {
+                            isProductAlreadyAdded = true;
+                            rowIndex = i;
+                            break;
+                        }
+                    }
+
+                    if (isProductAlreadyAdded) {
+                        int quantity = (int) productsTableModel.getValueAt(rowIndex, 2);
+                        int totalPrice = (int) productsTableModel.getValueAt(rowIndex, 4);
+                        quantity++;
+                        totalPrice = quantity * servicePrice;
+                        productsTableModel.setValueAt(quantity, rowIndex, 2);
+                        productsTableModel.setValueAt(totalPrice, rowIndex, 4);
+                    } else {
+                        productsTableModel.addRow(new Object[]{roomName, serviceName, 1, servicePrice, servicePrice});
+                    }
                 } else {
                     JOptionPane.showMessageDialog(null, "Vui lòng chọn phòng trước khi thêm sản phẩm - dịch vụ.");
                 }
@@ -208,13 +286,14 @@ public class BookingGroupForm extends JFrame {
         }
     }
 
-    private void filterRoomsByFloor() {
-        int selectedFloor = floorComboBox.getSelectedIndex(); // 0: Tất cả các tầng, 1: Tầng 1, 2: Tầng 2, ...
-        String selectedFloorString = selectedFloor == 0 ? "Tất cả các tầng" : "Tầng " + selectedFloor;
-        roomsTableModel.setRowCount(0);
+     private void filterRoomsByFloor() {
+        String selectedFloor = (String) floorComboBox.getSelectedItem();
+        roomsTableModel.setRowCount(0); // Clear existing rows
+
         for (Object[] room : roomData) {
-            if (selectedFloor == 0 || room[0].equals(selectedFloorString)) {
-                roomsTableModel.addRow(room);
+            String floor = (String) room[3];
+            if (selectedFloor.equals("Tất cả các tầng") || selectedFloor.equals(floor)) {
+                roomsTableModel.addRow(new Object[]{room[0], room[1]});
             }
         }
     }
