@@ -5,8 +5,11 @@ import com.myproject.forms.reservation.Form_Reservation;
 import com.myproject.forms.Form_2;
 import com.myproject.forms.Form_Goods;
 import com.myproject.forms.Form_Room;
-import com.myproject.forms.Form_RoomType;
+//import com.myproject.forms.Form_RoomType;
 import com.myproject.forms.Form_Customer;
+import com.myproject.forms.Form_DichVu; 
+import com.myproject.forms.Form_6; //Loại phòng
+import com.myproject.forms.Form_10; // Tầng
 import com.myproject.forms.account.Form_Account;
 import com.myproject.forms.Form_Home;
 import java.awt.Color;
@@ -19,7 +22,10 @@ public class Dashboard extends javax.swing.JFrame {
     private Form_2 form2;
     private Form_Goods form3;
     private Form_Room form4;
-    private Form_RoomType form5;
+   // private Form_RoomType form5;
+    private Form_6 form6;
+    private Form_DichVu form7;
+    private Form_10 form8;
     private Form_Customer formCustomer;
     private Form_Account formAccount;
 
@@ -32,7 +38,10 @@ public class Dashboard extends javax.swing.JFrame {
         form2 = new Form_2();
         form3 = new Form_Goods();
         form4 = new Form_Room();
-        form5 = new Form_RoomType();
+        //form5 = new Form_RoomType();
+        form6 = new Form_6(); //LoaiPhong
+        form7 = new Form_DichVu(); //DichVu
+        form8 = new Form_10();  //Tang
         formCustomer = new Form_Customer();
         formAccount = new Form_Account();
 
@@ -45,10 +54,13 @@ public class Dashboard extends javax.swing.JFrame {
                     case 3 -> setForm(form1);
                     case 4 -> setForm(form2);
                     case 5 -> setForm(form3);
-                    case 9 -> setForm(form4);
-                    case 10 -> setForm(form5);
-                    case 11 -> setForm(formCustomer);
-                    case 12 -> setForm(formAccount);
+                    case 6 -> setForm(form8);
+                    case 7 -> setForm(form7);
+                    //case 10 -> setForm(form5);
+                    case 11 -> setForm(form4);
+                    case 12 -> setForm(form6);
+                    case 13 -> setForm(formCustomer);
+                    case 14 -> setForm(formAccount);
                     
                     default -> {
                     }
