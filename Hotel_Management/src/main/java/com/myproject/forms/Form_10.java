@@ -120,11 +120,11 @@ public class Form_10 extends javax.swing.JPanel {
 
             },
             new String [] {
-                "Tầng", "Loại Phòng", "Chức Năng"
+                "Tầng", "Loại Phòng"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, true
+                false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -185,9 +185,8 @@ public class Form_10 extends javax.swing.JPanel {
             // Tạo một Document mới chứa dữ liệu bạn muốn thêm
             
             for (Document document : cursor) {
-                String value1 = document.getString("IDFloor");
-                String value2 = document.getString("TypeRoom");
-                //String value3 = document.getString("CostRoom");
+                String value1 = document.getString("code");
+                String value2 = document.getString("name");
                 
                 // Thêm hàng mới vào tableModel
                 model.addRow(new Object[]{value1, value2});
@@ -225,11 +224,9 @@ class Add_Floor extends JFrame
         setSize(450, 200);
         setLocationRelativeTo(null);
         
-        
         //Tạo các label
          JLabel lblIDFloor = new JLabel("Tầng: ");
          JLabel lblTypeRoom = new JLabel("Tên Loại Phòng:");
-         //JLabel lblCostRoom = new JLabel("Đơn Giá:");
     
         //Tạo các trường nhập
     
@@ -242,7 +239,8 @@ class Add_Floor extends JFrame
         String floorcode = txtIDFloor.getText();
         String typeRoom = txtTypeRoom.getText();
         //String costroom = txtCostRoom.getText();
-            
+        java.awt.GridBagConstraints gbc = new java.awt.GridBagConstraints();
+        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
         if (floorcode.isEmpty() || typeRoom.isEmpty() ) {
             JOptionPane.showMessageDialog(Add_Floor.this, "Vui lòng điền đầy đủ thông tin.", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
@@ -255,9 +253,8 @@ class Add_Floor extends JFrame
                 // Chọn bảng
                 MongoCollection<Document> collection = database.getCollection("Floor");
                 // Tạo một Document mới chứa dữ liệu bạn muốn thêm
-                Document document = new Document("IDFloor", floorcode)
-                        .append("TypeRoom", typeRoom);
-                        //.append("CostRoom", costroom);
+                Document document = new Document("code", floorcode)
+                        .append("name", typeRoom);
                 // Thêm Document vào bảng
                 collection.insertOne(document);
                 fetchDataFromMongoDB();
@@ -282,8 +279,6 @@ class Add_Floor extends JFrame
         panel1.add(txtIDFloor);
         panel1.add(lblTypeRoom);
         panel1.add(txtTypeRoom);
-//      panel1.add(lblCostRoom);
-//      panel1.add(txtCostRoom);
         panel1.add(btnClose);
         panel1.add(btnAdd);
         

@@ -12,18 +12,23 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.myproject.swings.ScrollBar;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.GridLayout;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.util.Map;
+import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.RowFilter;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import org.bson.Document;
@@ -45,6 +50,10 @@ public class Form_6 extends javax.swing.JPanel {
         JPanel p = new JPanel();
         p.setBackground(Color.WHITE);
         jScrollPane1.setCorner(JScrollPane.UPPER_RIGHT_CORNER, p);
+        
+//        int buttonColumnIndex = 3; // Chỉ số của cột mà bạn muốn hiển thị các ô JButtons
+//        table.getColumnModel().getColumn(buttonColumnIndex).setCellRenderer(new ButtonRenderer());
+//        table.getColumnModel().getColumn(buttonColumnIndex).setCellEditor(new ButtonEditor());
         fetchDataFromMongoDB();
         
     }
@@ -122,11 +131,11 @@ public class Form_6 extends javax.swing.JPanel {
 
             },
             new String [] {
-                "ID", "Loại Phòng", "Giá/ Đêm", "Chức Năng"
+                "Mã Loại Phòng", "Loại Phòng", "Giá", "Loại", "Trạng Thái"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                true, false, false, false
+                true, false, false, false, true
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -135,12 +144,14 @@ public class Form_6 extends javax.swing.JPanel {
         });
         jScrollPane1.setViewportView(table);
         if (table.getColumnModel().getColumnCount() > 0) {
-            table.getColumnModel().getColumn(0).setMinWidth(70);
-            table.getColumnModel().getColumn(0).setMaxWidth(70);
-            table.getColumnModel().getColumn(2).setMinWidth(250);
-            table.getColumnModel().getColumn(2).setMaxWidth(250);
-            table.getColumnModel().getColumn(3).setMinWidth(100);
-            table.getColumnModel().getColumn(3).setMaxWidth(100);
+            table.getColumnModel().getColumn(0).setMinWidth(100);
+            table.getColumnModel().getColumn(0).setMaxWidth(100);
+            table.getColumnModel().getColumn(1).setMinWidth(350);
+            table.getColumnModel().getColumn(1).setMaxWidth(350);
+            table.getColumnModel().getColumn(2).setMinWidth(150);
+            table.getColumnModel().getColumn(2).setMaxWidth(150);
+            table.getColumnModel().getColumn(3).setMinWidth(200);
+            table.getColumnModel().getColumn(3).setMaxWidth(200);
         }
 
         javax.swing.GroupLayout panelBorder1Layout = new javax.swing.GroupLayout(panelBorder1);
@@ -204,19 +215,72 @@ public class Form_6 extends javax.swing.JPanel {
             // Tạo một Document mới chứa dữ liệu bạn muốn thêm
             
             for (Document document : cursor) {
-                String value1 = document.getString("IDRoom");
-                String value2 = document.getString("TypeRoom");
-                String value3 = document.getString("CostRoom");
-                
+                String value1 = document.getString("code");
+                String value2 = document.getString("name");
+                int value3 = document.getInteger("price");
+                String value4 = document.getString("type");
+                String value5 = document.getString("status");
                 // Thêm hàng mới vào tableModel
-                model.addRow(new Object[]{value1, value2, value3});
+                model.addRow(new Object[]{value1, value2, value3, value4, value5});
             }
             // Thêm Document vào bảng
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
         }
     }
-    class Add_TypeRoom extends JFrame
+    
+class ButtonRenderer extends DefaultTableCellRenderer {
+    private JButton button;
+
+    public ButtonRenderer() {
+        button = new JButton();
+        button.setOpaque(true);
+    }
+
+    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+        button.setText("Sửa");
+        button.setBackground(new Color(153, 255, 153));
+        return button;
+    }
+}
+
+class ButtonEditor extends DefaultCellEditor {
+    private JButton button;
+
+       public ButtonEditor() {
+        super(new JCheckBox());
+        button = new JButton();
+        button.addActionListener(e -> fireEditingStopped());    
+        button.addActionListener((ActionEvent e) -> {
+            // Xử lý sự kiện nhấp chuột vào nút ở đây
+            Edit_TypeRoom editFrame = new Edit_TypeRoom();
+            editFrame.setVisible(true);
+        });
+}
+
+    public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+        button.setText("Sửa");
+        button.setBackground(new Color(153, 255, 153)); 
+        return button;
+    }
+
+    @Override
+    public Object getCellEditorValue() {
+        return button.getText();
+    }
+}
+class Edit_TypeRoom extends JFrame {
+    public Edit_TypeRoom(){
+        setTitle("Chỉnh sửa thông tin");
+        setSize(300, 200);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Đóng cửa sổ này mà không đóng ứng dụng chính
+        setLocationRelativeTo(null); // Hiển thị cửa sổ ở giữa màn hình
+        
+    }
+        
+}
+    
+class Add_TypeRoom extends JFrame
    {
     private JTextField txtRoomCode;
     private JTextField txtTypeRoom;
@@ -233,6 +297,7 @@ public class Form_6 extends javax.swing.JPanel {
          JLabel lblRoomCode = new JLabel("Mã Loại Phòng:");
          JLabel lblTypeRoom = new JLabel("Tên Loại Phòng:");
          JLabel lblCostRoom = new JLabel("Đơn Giá:");
+         
     
         //Tạo các trường nhập
     
