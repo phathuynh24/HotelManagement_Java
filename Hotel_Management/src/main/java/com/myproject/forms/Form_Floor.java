@@ -1,8 +1,9 @@
 package com.raven.form;
 
-import com.raven.controller.RoomTypeController;
-import com.raven.dialog.RoomTypeDialog;
-import com.raven.model.Model_RoomType;
+import com.raven.controller.FloorController;
+import com.raven.controller.RoomController;
+import com.raven.dialog.FloorDialog;
+import com.raven.model.Model_Floor;
 import com.raven.swing.table.EventAction;
 import com.raven.utils.DataChangeListener;
 import java.util.List;
@@ -11,14 +12,14 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 
-public class Form_RoomType extends javax.swing.JPanel implements DataChangeListener {
+public class Form_Floor extends javax.swing.JPanel implements DataChangeListener {
 
-    private RoomTypeController roomTypeController;
-    private List<Model_RoomType> roomTypes;
-    private EventAction<Model_RoomType> eventAction;
-    private RoomTypeDialog roomTypeDialog;
+    private FloorController floorController;
+    List<Model_Floor> floors;
+    EventAction<Model_Floor> eventAction;
+    private FloorDialog floorDialog;
 
-    public Form_RoomType() {
+    public Form_Floor() {
         initComponents();
         table1.fixTable(jScrollPane1);
         setOpaque(false);
@@ -27,9 +28,12 @@ public class Form_RoomType extends javax.swing.JPanel implements DataChangeListe
     }
 
     private void loadDataAsync() {
+        // Tạo một luồng mới để tải dữ liệu
         Thread loadDataThread = new Thread(() -> {
             initData();
         });
+
+        // Bắt đầu thực hiện luồng
         loadDataThread.start();
     }
 
@@ -37,56 +41,25 @@ public class Form_RoomType extends javax.swing.JPanel implements DataChangeListe
         DefaultTableModel model = (DefaultTableModel) table1.getModel();
         model.setRowCount(0);
 
-        roomTypeController = new RoomTypeController();
-        roomTypes = roomTypeController.getAllRoomTypes();
+        floorController = new FloorController();
+        floors = floorController.getAllFloors();
 
-        eventAction = new EventAction<Model_RoomType>() {
+        eventAction = new EventAction<Model_Floor>() {
             @Override
-            public void delete(Model_RoomType roomType) {
-                roomTypeController.deleteRoomType(roomType.getId());
+            public void delete(Model_Floor floor) {
+                floorController.deleteFloor(floor.getId());
                 loadDataAsync();
                 JOptionPane.showMessageDialog(null, "Xóa loại phòng thành công");
             }
 
             @Override
-            public void update(Model_RoomType roomType) {
-                roomTypeDialog = new RoomTypeDialog("Update", roomType, Form_RoomType.this);
+            public void update(Model_Floor floor) {
+                floorDialog = new FloorDialog("Update", floor, Form_Floor.this);
             }
         };
 
-        for (Model_RoomType roomType : roomTypes) {
-            model.addRow(roomType.toRowTable(eventAction));
-        }
-    }
-
-    private void attachSearchListener() {
-        searchText1.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                searchRoomTypes();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                searchRoomTypes();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                searchRoomTypes();
-            }
-        });
-    }
-
-    private void searchRoomTypes() {
-        String keyword = searchText1.getText().toLowerCase();
-        DefaultTableModel model = (DefaultTableModel) table1.getModel();
-        model.setRowCount(0); // Clear table
-
-        for (Model_RoomType roomType : roomTypes) {
-            if (roomTypeController.containsKeyword(roomType, keyword)) {
-                model.addRow(roomType.toRowTable(eventAction));
-            }
+        for (Model_Floor floor : floors) {
+            table1.addRow(floor.toRowTable(eventAction));
         }
     }
 
@@ -94,7 +67,38 @@ public class Form_RoomType extends javax.swing.JPanel implements DataChangeListe
     public void onDataChanged() {
         loadDataAsync();
     }
-    
+
+    private void attachSearchListener() {
+        searchText1.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                searchFloors();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                searchFloors();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                searchFloors();
+            }
+        });
+    }
+
+    private void searchFloors() {
+        String keyword = searchText1.getText().toLowerCase();
+        DefaultTableModel model = (DefaultTableModel) table1.getModel();
+        model.setRowCount(0); // Clear table
+
+        for (Model_Floor floor : floors) {
+            if (floorController.containsKeyword(floor, keyword)) {
+                model.addRow(floor.toRowTable(eventAction));
+            }
+        }
+    }
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -113,7 +117,7 @@ public class Form_RoomType extends javax.swing.JPanel implements DataChangeListe
 
         jLabel5.setFont(new java.awt.Font("sansserif", 1, 15)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(76, 76, 76));
-        jLabel5.setText("Thông tin Loại Phòng");
+        jLabel5.setText("Thông tin Tầng");
         jLabel5.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 10, 1, 1));
 
         table1.setModel(new javax.swing.table.DefaultTableModel(
@@ -121,11 +125,11 @@ public class Form_RoomType extends javax.swing.JPanel implements DataChangeListe
 
             },
             new String [] {
-                "ID", "Loại phòng", "Nhãn", "Giá", "Mô tả", "Thao tác"
+                "ID", "Tên tầng", "Tổng số phòng", "Thao tác"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, true
+                false, false, false, true
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -161,7 +165,7 @@ public class Form_RoomType extends javax.swing.JPanel implements DataChangeListe
         jPanel1.setOpaque(false);
 
         buttonHover1.setBorder(null);
-        buttonHover1.setText("Thêm Loại Phòng");
+        buttonHover1.setText("Thêm Tầng");
         buttonHover1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         buttonHover1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -211,8 +215,9 @@ public class Form_RoomType extends javax.swing.JPanel implements DataChangeListe
     }// </editor-fold>//GEN-END:initComponents
 
     private void buttonHover1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonHover1ActionPerformed
-        roomTypeDialog = new RoomTypeDialog("Add", null, Form_RoomType.this);
+        floorDialog = new FloorDialog("Add", null, Form_Floor.this);        // TODO add your handling code here:
     }//GEN-LAST:event_buttonHover1ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private com.raven.swing.ButtonHover buttonHover1;
