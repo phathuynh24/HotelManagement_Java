@@ -2,7 +2,6 @@ com\myproject\controllers\invoiceController.class
 com\myproject\forms\Form_10$1.class
 com\myproject\forms\reservation\CustomerForm$3.class
 com\myproject\models\Model_Room.class
-com\myproject\forms\Form_10$4.class
 com\myproject\models\Model_RoomType.class
 com\myproject\forms\Form_Customer$3.class
 com\myproject\login\Login.class
@@ -58,7 +57,6 @@ com\myproject\forms\Form_6$4.class
 com\myproject\swings\GoodsTable$2.class
 com\myproject\forms\Form_Room$1.class
 com\myproject\dashboard\Dashboard.class
-com\myproject\forms\Form_10$5.class
 com\myproject\forms\Form_RoomType$3.class
 com\myproject\forms\Form_DichVu$Edit_Service.class
 com\myproject\swings\MenuItem.class

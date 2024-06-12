@@ -49,7 +49,6 @@ public class Form_10 extends javax.swing.JPanel {
         jLayeredPane1 = new javax.swing.JLayeredPane();
         searchText1 = new com.myproject.swings.SearchText();
         jButton4 = new javax.swing.JButton();
-        buttonSec1 = new com.myproject.swings.ButtonSec();
         panelBorder1 = new com.myproject.swings.PanelBorder();
         jScrollPane1 = new javax.swing.JScrollPane();
         table1 = new com.myproject.swings.Table();
@@ -73,21 +72,8 @@ public class Form_10 extends javax.swing.JPanel {
             }
         });
 
-        buttonSec1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/myproject/icons/search.png"))); // NOI18N
-        buttonSec1.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                buttonSec1MouseClicked(evt);
-            }
-        });
-        buttonSec1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buttonSec1ActionPerformed(evt);
-            }
-        });
-
         jLayeredPane1.setLayer(searchText1, javax.swing.JLayeredPane.DEFAULT_LAYER);
         jLayeredPane1.setLayer(jButton4, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        jLayeredPane1.setLayer(buttonSec1, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
         javax.swing.GroupLayout jLayeredPane1Layout = new javax.swing.GroupLayout(jLayeredPane1);
         jLayeredPane1.setLayout(jLayeredPane1Layout);
@@ -95,9 +81,7 @@ public class Form_10 extends javax.swing.JPanel {
             jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jLayeredPane1Layout.createSequentialGroup()
                 .addComponent(searchText1, javax.swing.GroupLayout.PREFERRED_SIZE, 383, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0)
-                .addComponent(buttonSec1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 376, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 413, Short.MAX_VALUE)
                 .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(30, 30, 30))
         );
@@ -106,13 +90,9 @@ public class Form_10 extends javax.swing.JPanel {
             .addGroup(jLayeredPane1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(buttonSec1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(jLayeredPane1Layout.createSequentialGroup()
-                        .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(searchText1, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
+                    .addComponent(searchText1, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         table1.setModel(new javax.swing.table.DefaultTableModel(
@@ -289,7 +269,6 @@ class Add_Floor extends JFrame
     }   
 }
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private com.myproject.swings.ButtonSec buttonSec1;
     private javax.swing.JButton jButton4;
     private javax.swing.JLayeredPane jLayeredPane1;
     private javax.swing.JMenuItem jMenuItem1;
