@@ -1,50 +1,196 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package com.myproject.forms;
+package com.raven.form;
 
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
-import com.myproject.swings.GoodsTable;
-import com.myproject.swings.SearchText;
-import java.awt.Color;
-import java.awt.FlowLayout;
-import java.text.DecimalFormat;
-import java.util.Random;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.RowFilter;
+import com.raven.controller.GoodsController;
+import com.raven.dialog.GoodsDialog;
+import com.raven.model.Model_Goods;
+import com.raven.swing.table.EventAction;
+import com.raven.utils.DataChangeListener;
+import java.util.List;
+import javax.swing.JOptionPane;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableRowSorter;
-import org.bson.Document;
 
-public class Form_Goods extends javax.swing.JPanel {
+public class Form_Goods extends javax.swing.JPanel implements DataChangeListener {
 
-    /**
-     * Creates new form Form_1
-     */
+    private GoodsController goodsController;
+    private List<Model_Goods> goods;
+    private EventAction<Model_Goods> eventAction;
+    private GoodsDialog goodsDialog;
+
     public Form_Goods() {
         initComponents();
-        init();
-        loadGoodsDataFromMongoDB();
+        table1.fixTable(jScrollPane1);
+        setOpaque(false);
+        loadDataAsync();
+        attachSearchListener();
     }
 
-    /**
-     */
+    private void loadDataAsync() {
+        // Tạo một luồng mới để tải dữ liệu
+        Thread loadDataThread = new Thread(() -> {
+            initData();
+        });
+
+        // Bắt đầu thực hiện luồng
+        loadDataThread.start();
+    }
+
+    private void initData() {
+        DefaultTableModel model = (DefaultTableModel) table1.getModel();
+        model.setRowCount(0);
+
+        goodsController = new GoodsController();
+        goods = goodsController.getAllGoods();
+
+        eventAction = new EventAction<Model_Goods>() {
+            @Override
+            public void delete(Model_Goods merchandise) {
+                goodsController.deleteGoods(merchandise.getId());
+                loadDataAsync();
+                JOptionPane.showMessageDialog(null, "Xóa loại phòng thành công");
+            }
+
+            @Override
+            public void update(Model_Goods merchandise) {
+                goodsDialog = new GoodsDialog("Update", merchandise, Form_Goods.this);
+            }
+        };
+
+        for (Model_Goods merchandise : goods) {
+            table1.addRow(merchandise.toRowTable(eventAction));
+        }
+    }
+
+    private void attachSearchListener() {
+        searchText1.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                searchGoods();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                searchGoods();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                searchGoods();
+            }
+        });
+    }
+
+    private void searchGoods() {
+        String keyword = searchText1.getText().toLowerCase();
+        DefaultTableModel model = (DefaultTableModel) table1.getModel();
+        model.setRowCount(0); // Clear table
+
+        for (Model_Goods merchandise : goods) {
+            if (goodsController.containsKeyword(merchandise, keyword)) {
+                model.addRow(merchandise.toRowTable(eventAction));
+            }
+        }
+    }
+
+    @Override
+    public void onDataChanged() {
+        loadDataAsync();
+    }
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
+        jLabel5 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        table1 = new com.raven.swing.table.Table();
+        jPanel1 = new javax.swing.JPanel();
+        searchText1 = new com.raven.swing.SearchText();
+        buttonHover1 = new com.raven.swing.ButtonHover();
 
-        jLabel1.setFont(new java.awt.Font("sansserif", 0, 36)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(106, 106, 106));
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        setPreferredSize(new java.awt.Dimension(1058, 741));
+
+        jPanel2.setBackground(new java.awt.Color(255, 255, 255));
+
+        jLabel5.setFont(new java.awt.Font("sansserif", 1, 15)); // NOI18N
+        jLabel5.setForeground(new java.awt.Color(76, 76, 76));
+        jLabel5.setText("Thông tin Hàng Hóa");
+        jLabel5.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 10, 1, 1));
+
+        table1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "ID", "Tên hàng hóa", "Đơn vị", "Đơn giá nhập", "Đơn giá bán", "Mô tả", "Trạng thái", "Thao tác"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false, false, true
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        table1.setShowGrid(false);
+        table1.setShowHorizontalLines(true);
+        jScrollPane1.setViewportView(table1);
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(jLabel5)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING)))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel5)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 594, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(34, 34, 34))
+        );
+
+        jPanel1.setOpaque(false);
+
+        buttonHover1.setBorder(null);
+        buttonHover1.setText("Thêm Hàng Hóa");
+        buttonHover1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        buttonHover1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonHover1ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(searchText1, javax.swing.GroupLayout.PREFERRED_SIZE, 353, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 549, Short.MAX_VALUE)
+                .addComponent(buttonHover1, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(buttonHover1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(searchText1, javax.swing.GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE))
+                .addContainerGap())
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -52,345 +198,33 @@ public class Form_Goods extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 388, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(128, 128, 128)
-                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(125, 125, 125))
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 654, Short.MAX_VALUE)
+                .addGap(31, 31, 31))
         );
     }// </editor-fold>//GEN-END:initComponents
-     public void init() {
-        searchField = new SearchText();
-        addButton = new javax.swing.JButton();
-        importButton = new javax.swing.JButton();
-        deleteButton = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        goodsTable = new GoodsTable();
 
-        addButton.setText("Thêm hàng hóa");
-        addButton.setBackground(new java.awt.Color(28, 181, 224));
-        addButton.setForeground(new java.awt.Color(255, 255, 255));
+    private void buttonHover1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonHover1ActionPerformed
+        goodsDialog = new GoodsDialog("Add", null, Form_Goods.this);
+    }//GEN-LAST:event_buttonHover1ActionPerformed
 
-        importButton.setText("Nhập hàng");
-        importButton.setBackground(new java.awt.Color(28, 181, 224));
-        importButton.setForeground(new java.awt.Color(255, 255, 255));
-        
-        deleteButton.setText("Xóa hàng hóa");
-        deleteButton.setBackground(new java.awt.Color(28, 181, 224));
-        deleteButton.setForeground(new java.awt.Color(255, 255, 255));
 
-        goodsTable.setModel(new javax.swing.table.DefaultTableModel(
-                new Object[][]{},
-                new String[]{
-                    "Mã hàng hóa", "Tên hàng hóa", "Tồn kho", "Đơn vị tính", "Đơn giá nhập", "Đơn giá bán"
-                }
-        ) {
-            boolean[] canEdit = new boolean[]{
-                false, false, false, false, false, false, true, true
-            };
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit[columnIndex];
-            }
-        });
-
-        jScrollPane1.setViewportView(goodsTable);
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 578, Short.MAX_VALUE)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addComponent(searchField, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                .addComponent(addButton)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(deleteButton)
-                                                .addGap(20, 20, 20))))
-        );
-        layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(searchField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(addButton)
-                                        .addComponent(deleteButton))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 268, Short.MAX_VALUE)
-                                .addContainerGap())
-        );
-        addButton.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent e) {
-                showAddProductFrame();
-            }
-        });
-        deleteButton.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                int selectedRow = goodsTable.getSelectedRow();
-                if (selectedRow != -1) { // Kiểm tra xem có hàng nào được chọn không
-                    int confirm = javax.swing.JOptionPane.showConfirmDialog(null, "Bạn có chắc muốn xóa hàng này?", "Xác nhận xóa", javax.swing.JOptionPane.YES_NO_OPTION);
-                    if (confirm == javax.swing.JOptionPane.YES_OPTION) {
-                        deleteSelectedData(selectedRow);
-                    }
-                } else {
-                    javax.swing.JOptionPane.showMessageDialog(null, "Vui lòng chọn một hàng để xóa.", "Thông báo", javax.swing.JOptionPane.INFORMATION_MESSAGE);
-                }
-            }
-        });
-        searchField.addKeyListener(new java.awt.event.KeyAdapter() {
-            @Override
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                searchGoods(searchField.getText());
-            }
-        });
-        // Phương thức searchGoods để thực hiện tìm kiếm
-    }// </editor-fold>
-
-    private void searchGoods(String searchText) {
-        DefaultTableModel model = (DefaultTableModel) goodsTable.getModel();
-        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
-        goodsTable.setRowSorter(sorter);
-        sorter.setRowFilter(RowFilter.regexFilter("(?i)" + searchText, 0)); // Tìm kiếm theo mã hàng hóa (cột 0)
-    }
-
-    private void showAddProductFrame() {
-        // Create a new JFrame for the add product form
-        JFrame addProductFrame = new JFrame("Thêm sản phẩm mới");
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        // Create components for the frame
-        nameField = new javax.swing.JTextField(20);
-        descriptionArea = new javax.swing.JTextArea(4, 20);
-        descriptionArea.setLineWrap(true);
-        descriptionArea.setWrapStyleWord(true);
-        quantityField = new javax.swing.JTextField(20);
-        importPriceField = new javax.swing.JTextField(20);
-        sellPriceField = new javax.swing.JTextField(20);
-        codeField = new javax.swing.JTextField(20);
-        codeField.setEditable(false);
-        codeField.setEnabled(false);
-        codeField.setText(generateRandomCode());
-        unitField = new javax.swing.JTextField(20);
-        // Create buttons for the frame
-        javax.swing.JButton saveButton = new javax.swing.JButton("Lưu");
-        javax.swing.JButton cancelButton = new javax.swing.JButton("Hủy");
-
-        buttonPanel.add(saveButton);
-        buttonPanel.add(cancelButton);
-
-        // Add action listeners for buttons
-        saveButton.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent e) {
-                saveProduct();
-                addProductFrame.dispose(); // Đóng cửa sổ sau khi lưu
-            }
-        });
-        cancelButton.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(java.awt.event.ActionEvent e) {
-                addProductFrame.dispose(); // Đóng cửa sổ nếu hủy
-            }
-        });
-
-        // Layout for the frame
-        addProductFrame.setLayout(new java.awt.GridBagLayout());
-        java.awt.GridBagConstraints gbc = new java.awt.GridBagConstraints();
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5); // Thiết lập khoảng cách giữa các thành phần
-
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        addProductFrame.add(new JLabel("Mã hàng hóa:"), gbc);
-
-        gbc.gridx = 1;
-        addProductFrame.add(codeField, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        addProductFrame.add(new JLabel("Tên hàng hóa:"), gbc);
-
-        gbc.gridx = 1;
-        addProductFrame.add(nameField, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        addProductFrame.add(new JLabel("Đơn giá nhập:"), gbc);
-
-        gbc.gridx = 1;
-        addProductFrame.add(importPriceField, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        addProductFrame.add(new JLabel("Đơn giá bán:"), gbc);
-
-        gbc.gridx = 1;
-        addProductFrame.add(sellPriceField, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 4;
-        addProductFrame.add(new JLabel("Tồn kho:"), gbc);
-
-        gbc.gridx = 1;
-        addProductFrame.add(quantityField, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 5;
-        addProductFrame.add(new JLabel("Đơn vị tính:"), gbc);
-
-        gbc.gridx = 1;
-        addProductFrame.add(unitField, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 6;
-        addProductFrame.add(new JLabel("Mô tả:"), gbc);
-
-        gbc.gridx = 1;
-        addProductFrame.add(descriptionArea, gbc);
-
-        // Thêm nút "Lưu" và "Hủy"
-        gbc.gridx = 0;
-        gbc.gridy = 8;
-        gbc.gridwidth = 2; // Đặt gridwidth bằng 2 để nút chiếm cả hai cột
-        gbc.anchor = java.awt.GridBagConstraints.CENTER; // Đặt anchor để căn giữa
-        addProductFrame.add(buttonPanel, gbc);
-
-        // Set frame size and make it visible
-        addProductFrame.pack();
-        addProductFrame.setLocationRelativeTo(this);
-        addProductFrame.setVisible(true);
-    }
-
-    private void saveProduct() {
-        // Lấy thông tin từ các trường và thêm vào MongoDB
-        String name = nameField.getText();
-        String description = descriptionArea.getText();
-        double importPrice = Double.parseDouble(importPriceField.getText());
-        double sellPrice = Double.parseDouble(sellPriceField.getText());
-        String code = codeField.getText();
-        String unit = unitField.getText();
-        int quantity = Integer.parseInt(quantityField.getText());
-
-        // Thêm sản phẩm vào MongoDB (sử dụng phương thức addGoodsToMongoDB() đã được định nghĩa trong phần trước)
-        addGoodsToMongoDB(code, name, description, importPrice, sellPrice, unit, quantity);
-        loadGoodsDataFromMongoDB();
-    }
-
-    private void addGoodsToMongoDB(String code, String name, String description, double importPrice, double sellPrice, String unit, int quantity) {
-        String uri = "mongodb+srv://HotelGroup:xfwl2Y6oahXJugda@cluster0.awr6sf9.mongodb.net/";
-
-        try (MongoClient mongoClient = MongoClients.create(uri)) {
-            // Chọn hoặc tạo database
-            MongoDatabase database = mongoClient.getDatabase("Hotel_Management");
-
-            // Chọn hoặc tạo collection
-            MongoCollection<Document> collection = database.getCollection("Goods");
-
-            // Tạo một đối tượng Document để lưu dữ liệu
-            Document document = new Document();
-            document.put("code", code);
-            document.put("name", name);
-            document.put("quantity", quantity);
-            document.put("unit", unit);
-            document.put("importPrice", importPrice);
-            document.put("sellPrice", sellPrice);
-            document.put("description", description);
-            // Thêm document vào collection
-            collection.insertOne(document);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private String generateRandomCode() {
-        // Generate a random 4-digit number
-        Random rand = new Random();
-        int randomNum = rand.nextInt(900) + 100; // Generates number between 1000 and 9999
-        return "HH" + randomNum;
-    }
-
-    private void deleteSelectedData(int selectedRow) {
-        String uri = "mongodb+srv://HotelGroup:xfwl2Y6oahXJugda@cluster0.awr6sf9.mongodb.net/";
-
-        try (MongoClient mongoClient = MongoClients.create(uri)) {
-            // Chọn hoặc tạo database
-            MongoDatabase database = mongoClient.getDatabase("Hotel_Management");
-
-            // Chọn hoặc tạo collection
-            MongoCollection<Document> collection = database.getCollection("Goods");
-
-            // Lấy mã hàng hóa từ hàng được chọn trong bảng
-            String code = (String) goodsTable.getValueAt(selectedRow, 0);
-
-            // Xóa hàng được chọn từ MongoDB
-            collection.deleteOne(new Document("code", code));
-
-            // Xóa hàng được chọn từ bảng
-            DefaultTableModel model = (DefaultTableModel) goodsTable.getModel();
-            model.removeRow(selectedRow);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void loadGoodsDataFromMongoDB() {
-        String uri = "mongodb+srv://HotelGroup:xfwl2Y6oahXJugda@cluster0.awr6sf9.mongodb.net/";
-
-        try (MongoClient mongoClient = MongoClients.create(uri)) {
-            // Chọn hoặc tạo database
-            MongoDatabase database = mongoClient.getDatabase("Hotel_Management");
-
-            // Chọn hoặc tạo collection
-            MongoCollection<Document> collection = database.getCollection("Goods");
-
-            // Xóa dữ liệu cũ trong bảng
-            model = (DefaultTableModel) goodsTable.getModel();
-            model.setRowCount(0); // Xóa tất cả các hàng trong bảng
-            DecimalFormat currencyFormat = new DecimalFormat("#,###");
-            // Duyệt qua các document và thêm chúng vào bảng
-            for (Document doc : collection.find()) {
-                String code = doc.getString("code");
-                String name = doc.getString("name");
-                String description = doc.getString("description");
-                String importPrice = currencyFormat.format(doc.getDouble("importPrice"));                
-                String sellPrice = currencyFormat.format(doc.getDouble("sellPrice"));
-                String unit = doc.getString("unit");
-                int quantity = doc.getInteger("quantity");
-
-                // Thêm dữ liệu vào hàng mới trong bảng
-                model.addRow(new Object[]{code, name, quantity, unit, sellPrice, importPrice, sellPrice});
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
-    // End of variables declaration//GEN-END:variables
-    private javax.swing.JButton addButton;
-    private javax.swing.JButton importButton;
-    private javax.swing.JButton deleteButton;
+    private com.raven.swing.ButtonHover buttonHover1;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextField searchField;
-    private GoodsTable goodsTable;
-    private javax.swing.JTextField nameField;
-    private javax.swing.JTextArea descriptionArea;
-    private javax.swing.JTextField sellPriceField;
-    private javax.swing.JTextField quantityField;
-    private javax.swing.JTextField importPriceField;
-    private javax.swing.JTextField codeField;
-    private javax.swing.JTextField unitField;
-    private DefaultTableModel model;
-    // End of variables declaration                   
-
+    private com.raven.swing.SearchText searchText1;
+    private com.raven.swing.table.Table table1;
+    // End of variables declaration//GEN-END:variables
 }
