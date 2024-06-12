@@ -12,7 +12,7 @@ Phần mềm quản lý khách sạn được thiết kế nhằm hỗ trợ kh�
 | 1	|[Nguyễn Trương Bảo Duy](mailto:21522006@gm.uit.edu.vn)	| 21522006	|
 | 2	|[Huỳnh Tiến Phát](mailto:21520388@gm.uit.edu.vn)	| 21520388	| 
 | 3	|[Trần Tiến Phát](mailto:21522449@gm.uit.edu.vn)	| 21522449	|
-| 4	|[Lưu Tuấn Tài](mailto:21521936@gm.uit.edu.vn)	| 21521936	| 
+| 4	|[Lưu Tuấn Tài](mailto:21521936@gm.uit.edu.vn)	| 21522564	| 
 
 **Giáo viên hướng dẫn:** Lê Thanh Trọng
 
