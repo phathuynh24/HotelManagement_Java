@@ -25,3 +25,21 @@ Phần mềm quản lý khách sạn được thiết kế nhằm hỗ trợ kh�
 - **Database**: MongoDB
 
 ### Tính năng:
+
+- **Đăng nhập**
+- **Chức năng đặt phòng**
+- **Thống kê doanh thu**
+- **Quản lý tầng**
+- **Quản lý phòng**
+- **Quản lý nhân viên**
+- **Quản lý loại phòng**
+- **Quản lý dịch vụ**
+- **Quản lý nhân viên**
+- **Quản lý hàng hóa**
+- **Quản lý khách hàng**
+- **Quản lý hóa đơn**
+
+
+
+- **Design Pattern:** StarUML
+- **Database**: MongoDB
