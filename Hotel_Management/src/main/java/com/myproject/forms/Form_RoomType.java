@@ -1,324 +1,226 @@
-package com.myproject.forms;
+package com.raven.form;
 
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
-import com.myproject.swings.SearchText;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import javax.swing.border.LineBorder;
+import com.raven.controller.RoomTypeController;
+import com.raven.dialog.RoomTypeDialog;
+import com.raven.model.Model_RoomType;
+import com.raven.swing.table.EventAction;
+import com.raven.utils.DataChangeListener;
+import java.util.List;
+import javax.swing.JOptionPane;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
-import org.bson.Document;
 
-public class Form_RoomType extends javax.swing.JPanel {
+public class Form_RoomType extends javax.swing.JPanel implements DataChangeListener {
 
-    private JButton addButton;
-    private JButton editButton;
-    private JButton deleteButton;
-    private JTable roomTypeTable;
-    private JScrollPane jScrollPane1;
-    private JTextField searchField;
+    private RoomTypeController roomTypeController;
+    private List<Model_RoomType> roomTypes;
+    private EventAction<Model_RoomType> eventAction;
+    private RoomTypeDialog roomTypeDialog;
 
     public Form_RoomType() {
         initComponents();
-        fetchDataFromMongoDB();
-        setupUI();
-        setupEvents();
+        table1.fixTable(jScrollPane1);
+        setOpaque(false);
+        loadDataAsync();
+        attachSearchListener();
     }
 
-    private void setupUI() {
-        setLayout(new BorderLayout());
-        searchField = new SearchText();
+    private void loadDataAsync() {
+        Thread loadDataThread = new Thread(() -> {
+            initData();
+        });
+        loadDataThread.start();
+    }
+
+    private void initData() {
+        DefaultTableModel model = (DefaultTableModel) table1.getModel();
+        model.setRowCount(0);
+
+        roomTypeController = new RoomTypeController();
+        roomTypes = roomTypeController.getAllRoomTypes();
+
+        eventAction = new EventAction<Model_RoomType>() {
+            @Override
+            public void delete(Model_RoomType roomType) {
+                roomTypeController.deleteRoomType(roomType.getId());
+                loadDataAsync();
+                JOptionPane.showMessageDialog(null, "Xóa loại phòng thành công");
+            }
+
+            @Override
+            public void update(Model_RoomType roomType) {
+                roomTypeDialog = new RoomTypeDialog("Update", roomType, Form_RoomType.this);
+            }
+        };
+
+        for (Model_RoomType roomType : roomTypes) {
+            model.addRow(roomType.toRowTable(eventAction));
+        }
+    }
+
+    private void attachSearchListener() {
+        searchText1.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                searchRoomTypes();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                searchRoomTypes();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                searchRoomTypes();
+            }
+        });
+    }
+
+    private void searchRoomTypes() {
+        String keyword = searchText1.getText().toLowerCase();
+        DefaultTableModel model = (DefaultTableModel) table1.getModel();
+        model.setRowCount(0); // Clear table
+
+        for (Model_RoomType roomType : roomTypes) {
+            if (roomTypeController.containsKeyword(roomType, keyword)) {
+                model.addRow(roomType.toRowTable(eventAction));
+            }
+        }
+    }
+
+    @Override
+    public void onDataChanged() {
+        loadDataAsync();
+    }
+    
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        jPanel2 = new javax.swing.JPanel();
+        jLabel5 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        
-        jScrollPane1.setViewportView(roomTypeTable);
-        
+        table1 = new com.raven.swing.table.Table();
+        jPanel1 = new javax.swing.JPanel();
+        searchText1 = new com.raven.swing.SearchText();
+        buttonHover1 = new com.raven.swing.ButtonHover();
+
+        setPreferredSize(new java.awt.Dimension(1058, 741));
+
+        jPanel2.setBackground(new java.awt.Color(255, 255, 255));
+
+        jLabel5.setFont(new java.awt.Font("sansserif", 1, 15)); // NOI18N
+        jLabel5.setForeground(new java.awt.Color(76, 76, 76));
+        jLabel5.setText("Thông tin Loại Phòng");
+        jLabel5.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 10, 1, 1));
+
+        table1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "ID", "Loại phòng", "Nhãn", "Giá", "Mô tả", "Thao tác"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, true
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        table1.setShowGrid(false);
+        table1.setShowHorizontalLines(true);
+        jScrollPane1.setViewportView(table1);
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(jLabel5)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING)))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel5)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 594, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(34, 34, 34))
+        );
+
+        jPanel1.setOpaque(false);
+
+        buttonHover1.setBorder(null);
+        buttonHover1.setText("Thêm Loại Phòng");
+        buttonHover1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        buttonHover1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonHover1ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(searchText1, javax.swing.GroupLayout.PREFERRED_SIZE, 353, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 549, Short.MAX_VALUE)
+                .addComponent(buttonHover1, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(buttonHover1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(searchText1, javax.swing.GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 578, Short.MAX_VALUE)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addComponent(searchField, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                .addComponent(addButton)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(editButton)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(deleteButton)
-                                                .addGap(20, 20, 20))))
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(searchField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(addButton)
-                                        .addComponent(editButton)
-                                        .addComponent(deleteButton))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 268, Short.MAX_VALUE)
-                                .addContainerGap())
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 654, Short.MAX_VALUE)
+                .addGap(31, 31, 31))
         );
-    }
-    
-    private void setupEvents() {
-        addButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Xử lý khi nhấn nút Thêm
-                showAddDialog();
-            }
-        });
+    }// </editor-fold>//GEN-END:initComponents
 
-        editButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int selectedRow = roomTypeTable.getSelectedRow();
-                if (selectedRow != -1) {
-                    // Lấy các giá trị từ hàng được chọn
-                    String roomTypeName = roomTypeTable.getValueAt(selectedRow, 0).toString();
-                    String roomTypeDescription = roomTypeTable.getValueAt(selectedRow, 1).toString();
-                    String roomTypePrice = roomTypeTable.getValueAt(selectedRow, 2).toString();
+    private void buttonHover1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonHover1ActionPerformed
+        roomTypeDialog = new RoomTypeDialog("Add", null, Form_RoomType.this);
+    }//GEN-LAST:event_buttonHover1ActionPerformed
 
-                    // Hiển thị dialog sửa đổi với các giá trị từ hàng được chọn
-                    showEditDialog(roomTypeName, roomTypeDescription, roomTypePrice);
-                } else {
-                    JOptionPane.showMessageDialog(Form_RoomType.this, "Vui lòng chọn một loại phòng để sửa.");
-                }
-            }
-        });
-
-        deleteButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Xử lý khi nhấn nút Xóa
-                int selectedRow = roomTypeTable.getSelectedRow();
-                if (selectedRow != -1) {
-                    // Xác nhận xóa và xóa loại phòng khỏi cơ sở dữ liệu
-                    int option = JOptionPane.showConfirmDialog(Form_RoomType.this, "Bạn có chắc muốn xóa loại phòng này không?", "Xác nhận Xóa", JOptionPane.YES_NO_OPTION);
-                    if (option == JOptionPane.YES_OPTION) {
-                        deleteSelectedRoom();
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(Form_RoomType.this, "Vui lòng chọn một loại phòng để xóa.");
-                }
-            }
-        });
-    
-        searchField.addKeyListener(new java.awt.event.KeyAdapter() {
-            @Override
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-//                searchGoods(searchField.getText());
-            }
-        });
-    }
-
-    private void showAddDialog() {
-        JTextField nameField = new JTextField(30);
-        JTextArea descriptionArea = new JTextArea(3, 30);
-        JTextField priceField = new JTextField(30);
-
-        JPanel panel = new JPanel(new GridBagLayout());
-        GridBagConstraints constraints = new GridBagConstraints();
-        constraints.anchor = GridBagConstraints.WEST;
-        constraints.insets = new Insets(10, 10, 10, 10);
-
-        constraints.gridx = 0;
-        constraints.gridy = 0;
-        panel.add(new JLabel("Tên loại phòng:"), constraints);
-
-        constraints.gridx = 1;
-        panel.add(nameField, constraints);
-
-        constraints.gridx = 0;
-        constraints.gridy = 1;
-        panel.add(new JLabel("Giá loại phòng:"), constraints);
-
-        constraints.gridx = 1;
-        panel.add(priceField, constraints);
-
-        constraints.gridx = 0;
-        constraints.gridy = 2;
-        panel.add(new JLabel("Mô tả loại phòng:"), constraints);
-
-        constraints.gridx = 1;
-        panel.add(new JScrollPane(descriptionArea), constraints);
-
-        int result = JOptionPane.showConfirmDialog(this, panel, "Thêm loại phòng", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-        if (result == JOptionPane.OK_OPTION) {
-            String roomTypeName = nameField.getText();
-            String roomTypeDescription = descriptionArea.getText();
-            String roomTypePrice = priceField.getText();
-            if (roomTypeName.isEmpty() || roomTypeDescription.isEmpty() || roomTypePrice.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ thông tin.");
-                return;
-            }
-            try (MongoClient mongoClient = MongoClients.create("mongodb+srv://HotelGroup:xfwl2Y6oahXJugda@cluster0.awr6sf9.mongodb.net/")) {
-                MongoDatabase database = mongoClient.getDatabase("Hotel_Management");
-                MongoCollection<Document> collection = database.getCollection("RoomType");
-                Document document = new Document("RoomTypeName", roomTypeName)
-                        .append("Description", roomTypeDescription)
-                        .append("Price", roomTypePrice);
-                collection.insertOne(document);
-                fetchDataFromMongoDB();
-            } catch (Exception e) {
-                System.err.println(e.getClass().getName() + ": " + e.getMessage());
-            }
-        }
-    }
-
-    private void showEditDialog(String roomTypeName, String roomTypeDescription, String roomTypePrice) {
-        JTextField nameField = new JTextField(roomTypeName, 20);
-        JTextArea descriptionArea = new JTextArea(roomTypeDescription, 5, 20);
-        JTextField priceField = new JTextField(roomTypePrice, 10);
-
-        JPanel panel = new JPanel(new GridBagLayout());
-        GridBagConstraints constraints = new GridBagConstraints();
-        constraints.anchor = GridBagConstraints.WEST;
-        constraints.insets = new Insets(10, 10, 10, 10);
-
-        constraints.gridx = 0;
-        constraints.gridy = 0;
-        panel.add(new JLabel("Tên loại phòng:"), constraints);
-
-        constraints.gridx = 1;
-        panel.add(nameField, constraints);
-
-        constraints.gridx = 0;
-        constraints.gridy = 1;
-        panel.add(new JLabel("Mô tả:"), constraints);
-
-        constraints.gridx = 1;
-        panel.add(new JScrollPane(descriptionArea), constraints);
-
-        constraints.gridx = 0;
-        constraints.gridy = 2;
-        panel.add(new JLabel("Giá loại phòng:"), constraints);
-
-        constraints.gridx = 1;
-        panel.add(priceField, constraints);
-
-        int result = JOptionPane.showConfirmDialog(this, panel, "Sửa loại phòng", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-        if (result == JOptionPane.OK_OPTION) {
-            // Lấy các giá trị mới từ dialog
-            String newRoomTypeName = nameField.getText();
-            String newRoomTypeDescription = descriptionArea.getText();
-            String newRoomTypePrice = priceField.getText();
-
-            // Cập nhật dữ liệu trong cơ sở dữ liệu
-            updateRoomTypeInDatabase(roomTypeName, newRoomTypeName, newRoomTypeDescription, newRoomTypePrice);
-
-            // Cập nhật lại JTable
-            fetchDataFromMongoDB();
-        }
-    }
-
-    private void updateRoomTypeInDatabase(String oldRoomTypeName, String newRoomTypeName, String newRoomTypeDescription, String newRoomTypePrice) {
-        try (MongoClient mongoClient = MongoClients.create("mongodb+srv://HotelGroup:xfwl2Y6oahXJugda@cluster0.awr6sf9.mongodb.net/")) {
-            MongoDatabase database = mongoClient.getDatabase("Hotel_Management");
-            MongoCollection<Document> collection = database.getCollection("RoomType");
-
-            // Tìm và cập nhật dòng tương ứng trong cơ sở dữ liệu
-            collection.updateOne(
-                    new Document("RoomTypeName", oldRoomTypeName),
-                    new Document("$set", new Document("RoomTypeName", newRoomTypeName)
-                            .append("Description", newRoomTypeDescription)
-                            .append("Price", newRoomTypePrice)
-                    )
-            );
-        } catch (Exception e) {
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
-        }
-    }
-
-    private void deleteSelectedRoom() {
-        // Lấy chỉ mục hàng được chọn trong JTable
-        int selectedRow = roomTypeTable.getSelectedRow();
-        if (selectedRow != -1) {
-            // Lấy giá trị cột RoomName tại hàng được chọn
-            String roomName = roomTypeTable.getValueAt(selectedRow, 0).toString();
-
-            try (MongoClient mongoClient = MongoClients.create("mongodb+srv://HotelGroup:xfwl2Y6oahXJugda@cluster0.awr6sf9.mongodb.net/")) {
-                // Chọn cơ sở dữ liệu
-                MongoDatabase database = mongoClient.getDatabase("Hotel_Management");
-
-                // Chọn bảng
-                MongoCollection<Document> collection = database.getCollection("RoomType");
-
-                // Tạo một Document để xóa dựa trên RoomName
-                Document query = new Document("RoomTypeName", roomName);
-
-                // Xóa Document từ bảng
-                collection.deleteOne(query);
-
-                // Sau khi xóa từ cơ sở dữ liệu, cập nhật lại JTable
-                fetchDataFromMongoDB();
-            } catch (Exception e) {
-                System.err.println(e.getClass().getName() + ": " + e.getMessage());
-            }
-        } else {
-            JOptionPane.showMessageDialog(Form_RoomType.this, "Vui lòng chọn một loại phòng để xóa.");
-        }
-    }
-
-    private void fetchDataFromMongoDB() {
-        try (MongoClient mongoClient = MongoClients.create("mongodb+srv://HotelGroup:xfwl2Y6oahXJugda@cluster0.awr6sf9.mongodb.net/")) {
-            // Chọn cơ sở dữ liệu
-            MongoDatabase database = mongoClient.getDatabase("Hotel_Management");
-
-            // Chọn bảng
-            MongoCollection<Document> collection = database.getCollection("RoomType");
-
-            // Lấy dữ liệu từ MongoDB
-            var documents = collection.find().into(new ArrayList<>());
-
-            // Tạo DefaultTableModel để chứa dữ liệu
-            DefaultTableModel model = new DefaultTableModel();
-            model.addColumn("Loại phòng");
-            model.addColumn("Mô tả");
-            model.addColumn("Giá");
-            DecimalFormat currencyFormat = new DecimalFormat("#,###");
-
-            // Thêm dữ liệu từ MongoDB vào DefaultTableModel
-            for (Document doc : documents) {
-                String price = currencyFormat.format(Integer.parseInt(doc.getString("Price")));
-
-                model.addRow(new Object[]{
-                        doc.getString("RoomTypeName"),
-                        doc.getString("Description"),
-                        price
-                });
-            }
-
-            // Cập nhật JTable với dữ liệu mới
-            roomTypeTable.setModel(model);
-        } catch (Exception e) {
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
-        }
-    }
-
-    private void initComponents() {
-        addButton = new JButton("Thêm loại phòng");
-        addButton.setBackground(new java.awt.Color(28, 181, 224));
-        addButton.setForeground(new java.awt.Color(255, 255, 255));
-        editButton = new JButton("Sửa loại phòng");
-        editButton.setBackground(new java.awt.Color(28, 181, 224));
-        editButton.setForeground(new java.awt.Color(255, 255, 255));
-        deleteButton = new JButton("Xóa loại phòng");
-        deleteButton.setBackground(new java.awt.Color(28, 181, 224));
-        deleteButton.setForeground(new java.awt.Color(255, 255, 255));
-        roomTypeTable = new com.myproject.swings.GoodsTable();
-        
-    }
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private com.raven.swing.ButtonHover buttonHover1;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JScrollPane jScrollPane1;
+    private com.raven.swing.SearchText searchText1;
+    private com.raven.swing.table.Table table1;
+    // End of variables declaration//GEN-END:variables
 }

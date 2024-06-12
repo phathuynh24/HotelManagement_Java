@@ -2,7 +2,6 @@ com\myproject\controllers\invoiceController.class
 com\myproject\forms\Form_10$1.class
 com\myproject\forms\reservation\CustomerForm$3.class
 com\myproject\models\Model_Room.class
-com\myproject\forms\Form_10$4.class
 com\myproject\models\Model_RoomType.class
 com\myproject\forms\Form_Customer$3.class
 com\myproject\login\Login.class
@@ -52,17 +51,18 @@ com\myproject\forms\reservation\BookingGroupForm$1.class
 com\myproject\swings\ModernScrollBarUI$InvisibleScrollBarButton.class
 com\myproject\swings\TableHeader.class
 com\myproject\forms\Form_Goods$2.class
+com\myproject\forms\Form_6$ButtonRenderer.class
 com\myproject\models\account\Model_Permission.class
 com\myproject\forms\Form_6$4.class
 com\myproject\swings\GoodsTable$2.class
 com\myproject\forms\Form_Room$1.class
 com\myproject\dashboard\Dashboard.class
-com\myproject\forms\Form_10$5.class
 com\myproject\forms\Form_RoomType$3.class
 com\myproject\forms\Form_DichVu$Edit_Service.class
 com\myproject\swings\MenuItem.class
 com\myproject\forms\reservation\CustomerForm$4.class
 com\myproject\forms\account\Form_Account.class
+com\myproject\forms\Form_6$ButtonEditor.class
 com\myproject\forms\Form_Customer$2.class
 com\myproject\forms\Form_Goods$3.class
 com\myproject\forms\reservation\BookingForm$3.class
@@ -79,7 +79,6 @@ com\myproject\dashboard\Dashboard$2.class
 com\myproject\swings\PanelBorder.class
 com\myproject\forms\Form_RoomType$2.class
 com\myproject\models\Model_Menu$MenuType.class
-com\myproject\forms\Form_DichVu$Del_DichVuForm.class
 com\myproject\forms\Form_RoomType.class
 com\myproject\forms\reservation\BookingGroupForm$2.class
 com\myproject\components\action_button\PanelAction.class
@@ -146,6 +145,7 @@ com\myproject\forms\reservation\BookingForm$DateLabelFormatter.class
 com\myproject\forms\reservation\BookingForm$4$1.class
 com\myproject\forms\Form_Room$4.class
 com\myproject\forms\reservation\CustomerForm$1.class
+com\myproject\forms\Form_6$Edit_TypeRoom.class
 com\myproject\forms\reservation\Form_Reservation$1.class
 com\myproject\components\action_button\CustomTableCellRenderer.class
 com\myproject\hotel_management\Hotel_Management.class

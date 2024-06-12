@@ -45,11 +45,6 @@ import org.bson.types.ObjectId;
 
 public class Form_DichVu extends javax.swing.JPanel {
     
-//    private List<Service> serList = new ArrayList<>();
-//    private DefaultTableModel tableModel;
-//    private Add_Service add_Service;
-//    private Edit_ServiceForm edit_ServiceForm;
-    
     public Form_DichVu() {
         initComponents();
         jScrollPane1.setVerticalScrollBar(new ScrollBar());
@@ -59,14 +54,13 @@ public class Form_DichVu extends javax.swing.JPanel {
         p.setBackground(Color.WHITE);
         jScrollPane1.setCorner(JScrollPane.UPPER_RIGHT_CORNER, p);
         
-        
-        int buttonColumnIndex = 4; // Chỉ số của cột mà bạn muốn hiển thị các ô JButtons
-        table1.getColumnModel().getColumn(buttonColumnIndex).setCellRenderer(new ButtonRenderer());
-        table1.getColumnModel().getColumn(buttonColumnIndex).setCellEditor(new ButtonEditor());
+        // tạo nút trong table
+//        int buttonColumnIndex = 4; // Chỉ số của cột mà bạn muốn hiển thị các ô JButtons
+//        table1.getColumnModel().getColumn(buttonColumnIndex).setCellRenderer(new ButtonRenderer());
+//        table1.getColumnModel().getColumn(buttonColumnIndex).setCellEditor(new ButtonEditor());
         
         fetchDataFromMongoDB();
         //displayUser();
-
     }
 
     @SuppressWarnings("unchecked")
@@ -138,7 +132,7 @@ public class Form_DichVu extends javax.swing.JPanel {
 
             },
             new String [] {
-                "ID", "Loại Dịch Vụ", "Đơn Vị Tính", "Đơn Giá", "Chức Năng"
+                "Mã Dịch Vụ", "Tên Dịch Vụ", "Đơn Vị Tính", "Đơn Giá", "Trạng thái"
             }
         ) {
             boolean[] canEdit = new boolean [] {
@@ -151,8 +145,8 @@ public class Form_DichVu extends javax.swing.JPanel {
         });
         jScrollPane1.setViewportView(table1);
         if (table1.getColumnModel().getColumnCount() > 0) {
-            table1.getColumnModel().getColumn(0).setMinWidth(70);
-            table1.getColumnModel().getColumn(0).setMaxWidth(70);
+            table1.getColumnModel().getColumn(0).setMinWidth(100);
+            table1.getColumnModel().getColumn(0).setMaxWidth(100);
             table1.getColumnModel().getColumn(2).setMinWidth(200);
             table1.getColumnModel().getColumn(2).setMaxWidth(200);
             table1.getColumnModel().getColumn(3).setMinWidth(200);
@@ -205,19 +199,18 @@ public class Form_DichVu extends javax.swing.JPanel {
             // Chọn bảng
             MongoCollection<Document> collection = database.getCollection("Service");
             FindIterable<Document> cursor = collection.find();
-            //tableModel = (DefaultTableModel)table1.getModel();
             DefaultTableModel model = (DefaultTableModel)table1.getModel();
-            //tableModel.setRowCount(0);
             model.setRowCount(0);
             // Tạo một Document mới chứa dữ liệu bạn muốn thêm
             
             for (Document document : cursor) {
-                String value1 = document.getString("IDService");
-                String value2 = document.getString("TypeService");
-                String value3 = document.getString("Unit");
-                String value4 = document.getString("CostService");
+                String value1 = document.getString("code");
+                String value2 = document.getString("name");
+                String value3 = document.getString("unit");
+                String value4 = document.getString("price");
+                String value5 = document.getString("status");
                 // Thêm hàng mới vào tableModel
-                model.addRow(new Object[]{value1, value2, value3, value4});
+                model.addRow(new Object[]{value1, value2, value3, value4, value5});
             }      
             // Thêm Document vào bảng
         } catch (Exception e) {
@@ -300,12 +293,12 @@ class Edit_Service extends JFrame {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
-
 class Add_Service extends JFrame{
         private JTextField txtServiceCode;
         private JTextField txtTypeService;
         private JTextField txtUnit;  
         private JTextField txtCostService;
+        private JTextField txtStatusService;
     public Add_Service()
     {
         setTitle("Thêm Loại Dịch Vụ");
@@ -318,6 +311,7 @@ class Add_Service extends JFrame{
          JLabel lblTypeService = new JLabel("Tên Dịch vụ:");
          JLabel lblUnit = new JLabel("Đơn vị tính:");
          JLabel lblCostService = new JLabel("Đơn Giá:");
+         JLabel lblStatusService = new JLabel("Trạng thái:");
     
         //Tạo các trường nhập
     
@@ -325,6 +319,7 @@ class Add_Service extends JFrame{
         txtTypeService = new JTextField(20);
         txtUnit = new JTextField(20);
         txtCostService = new JTextField(20);
+        txtStatusService = new JTextField(20);
 
         JButton btnAdd = new JButton("Thêm");
         btnAdd.setBounds(50, 50, 100, 30);
@@ -335,8 +330,9 @@ class Add_Service extends JFrame{
             String typeservice = txtTypeService.getText();
             String unit = txtUnit.getText();
             String costservice = txtCostService.getText();
-                
-        if (servicecode.isEmpty() || typeservice.isEmpty() || unit.isEmpty() || costservice.isEmpty() ) {
+            String status = txtStatusService.getText();
+            
+        if (servicecode.isEmpty() || typeservice.isEmpty() || unit.isEmpty() || costservice.isEmpty() || status.isEmpty() ) {
             JOptionPane.showMessageDialog(Add_Service.this, "Vui lòng điền đầy đủ thông tin.", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -344,14 +340,14 @@ class Add_Service extends JFrame{
             MongoClient mongoClient = MongoClients.create("mongodb+srv://HotelGroup:xfwl2Y6oahXJugda@cluster0.awr6sf9.mongodb.net/")) {
             // Chọn cơ sở dữ liệu
             MongoDatabase database = mongoClient.getDatabase("Hotel_Management");
-                    
             // Chọn bảsng
             MongoCollection<Document> collection = database.getCollection("Service");
             // Tạo một Document mới chứa dữ liệu bạn muốn thêm
-            Document document = new Document("IDService", servicecode)
-                 .append("TypeService", typeservice)
-                 .append("Unit", unit)
-                 .append("CostService", costservice);
+            Document document = new Document("code", servicecode)
+                 .append("name", typeservice)
+                 .append("unit", unit)
+                 .append("price", costservice)
+                 .append("status", status);
                 // Thêm Document vào bảng
                 collection.insertOne(document);
                 fetchDataFromMongoDB();
@@ -381,6 +377,8 @@ class Add_Service extends JFrame{
         panel1.add(txtUnit);
         panel1.add(lblCostService);
         panel1.add(txtCostService);
+        panel1.add(lblStatusService);
+        panel1.add(txtStatusService);
         panel1.add(btnClose);
         panel1.add(btnAdd);
 
@@ -389,103 +387,6 @@ class Add_Service extends JFrame{
         setVisible(true);
     }   
 }
-class Del_DichVuForm extends JFrame{
-}
-//class Edit_ServiceForm extends JFrame {
-//    private JTextField txtServiceCode;
-//    private JTextField txtTypeService;
-//    private JTextField txtUnit; 
-//    private JTextField txtCostService;     
-//    private Service serviceData;
-//    private int intdexRow;
-//    private Form_DichVu formDichVu;
-//
-//    public Edit_ServiceForm(Service serviceData, Form_DichVu formDichVu, int intdexRow) {
-//        this.serviceData = serviceData;
-//        this.formDichVu = formDichVu;
-//        this.intdexRow = intdexRow;
-//
-//        setResizable(false);
-//        setTitle("Chỉnh sửa thông tin");
-//        setSize(300, 200);
-//        setLocationRelativeTo(null);
-//
-//        // Tạo các label
-//         JLabel lblServiceCode = new JLabel("Mã Dịch vụ:");
-//         JLabel lblTypeService = new JLabel("Tên Dịch vụ:");
-//         JLabel lblUnit = new JLabel("Đơn vị tính:");
-//         JLabel lblCostService = new JLabel("Đơn Giá:");
-//
-//        // Tạo các trường nhập liệu và điền thông tin người dùng cần chỉnh sửa
-//        txtServiceCode = new JTextField(20);
-//        txtServiceCode.setText(serviceData.getServiceCode());
-//        txtTypeService = new JTextField(20);
-//        txtTypeService.setText(serviceData.getTypeService());
-//        txtUnit = new JTextField(20);
-//        txtUnit.setText(serviceData.getUnit());
-//        txtCostService = new JTextField(20);
-//        txtCostService.setText(serviceData.getCostService());
-//        
-//        // Tạo nút "Lưu"
-//        JButton btnSave = new JButton("Lưu");
-//        btnSave.addActionListener((ActionEvent e) -> {
-//            String servicecode = txtServiceCode.getText();
-//            String typeservice = txtTypeService.getText();
-//            String unit = txtUnit.getText();
-//            String costservice = txtCostService.getText();
-//            
-//            if (servicecode.isEmpty() || typeservice.isEmpty() || unit.isEmpty() || costservice.isEmpty()) {
-//                JOptionPane.showMessageDialog(Edit_ServiceForm.this, "Vui lòng điền đầy đủ thông tin.", "Lỗi", JOptionPane.ERROR_MESSAGE);
-//                return;
-//            }
-//            // Thực hiện cập nhật thông tin người dùng trong cơ sở dữ liệu
-//            try (
-//                MongoClient mongoClient = MongoClients.create("mongodb+srv://HotelGroup:xfwl2Y6oahXJugda@cluster0.awr6sf9.mongodb.net/")) {
-//            // Chọn cơ sở dữ liệu
-//            MongoDatabase database = mongoClient.getDatabase("Hotel_Management");
-//            // Chọn bảng
-//            MongoCollection<Document> collection = database.getCollection("Service");
-//
-//            // Tạo điều kiện để xác định người dùng cần cập nhật
-//            Bson filter = Filters.eq("_id", new ObjectId(servicecode));
-//
-//            // Tạo một Document mới chứa thông tin người dùng đã cập nhật
-//            Document updateDocument = new Document("$set", new Document("typeService", typeservice)
-//                    .append("unit", unit)
-//                    .append("costService", costservice));
-//            // Thực hiện cập nhật thông tin người dùng trong bảng
-//            UpdateResult updateResult = collection.updateOne(filter, updateDocument);
-//                // Code cập nhật thông tin người dùng vào cơ sở dữ liệu tại đây
-//                
-//                // Hiển thị thông báo thành công
-//                JOptionPane.showMessageDialog(Edit_ServiceForm.this, "Cập nhật thành công!");
-//                setVisible(false);
-//            } catch (HeadlessException ex) {
-//                JOptionPane.showMessageDialog(Edit_ServiceForm.this, "Lỗi khi cập nhật: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
-//            }
-//        }); 
-//            JButton btnClose = new JButton("Đóng");
-//            btnClose.addActionListener((ActionEvent e) -> {
-//            setVisible(false);
-//        });
-//
-//        // Tạo panel và thêm các thành phần vào panel
-//        JPanel panel = new JPanel(new GridLayout(4, 2));
-//        panel.add(lblServiceCode);
-//        panel.add(txtServiceCode);
-//        panel.add(lblTypeService);
-//        panel.add(txtTypeService);
-//        panel.add(lblUnit);
-//        panel.add(txtUnit);
-//        panel.add(lblCostService);
-//        panel.add(txtCostService);
-//        panel.add(btnSave);
-//
-//        // Thêm panel vào frame
-//        add(panel);
-//        setVisible(true);
-//    }
-//}
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private com.myproject.swings.ButtonSec buttonSec1;
