@@ -12,9 +12,20 @@
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/Nam_3/HK2/java/HotelManagement/HotelManagement/src/com/raven/form/reservation/Form_Booking.java</file>
-            <file>file:/D:/Nam_3/HK2/java/HotelManagement/HotelManagement/src/com/raven/form/reservation/Form_GroupBooking.java</file>
-            <file>file:/D:/Nam_3/HK2/java/HotelManagement/HotelManagement/src/com/raven/form/reservation/Form_Reservation.java</file>
+            <file>file:/E:/UIT_3/HK2/SE330_Java/HotelManagement_Java/Hotel_Management/src/com/raven/form/Form_Service.java</file>
+            <file>file:/E:/UIT_3/HK2/SE330_Java/HotelManagement_Java/Hotel_Management/src/com/raven/form/reservation/Form_Booking.java</file>
+            <file>file:/E:/UIT_3/HK2/SE330_Java/HotelManagement_Java/Hotel_Management/src/com/raven/model/Model_Service.java</file>
+            <file>file:/E:/UIT_3/HK2/SE330_Java/HotelManagement_Java/Hotel_Management/src/com/raven/dialog/EmployeeDialog.java</file>
+            <file>file:/E:/UIT_3/HK2/SE330_Java/HotelManagement_Java/Hotel_Management/src/com/raven/dialog/FloorDialog.java</file>
+            <file>file:/E:/UIT_3/HK2/SE330_Java/HotelManagement_Java/Hotel_Management/src/com/raven/dialog/GoodsDialog.java</file>
+            <file>file:/E:/UIT_3/HK2/SE330_Java/HotelManagement_Java/Hotel_Management/src/com/raven/form/Form_Statistic.java</file>
+            <file>file:/E:/UIT_3/HK2/SE330_Java/HotelManagement_Java/Hotel_Management/src/com/raven/controller/CustomerController.java</file>
+            <file>file:/E:/UIT_3/HK2/SE330_Java/HotelManagement_Java/Hotel_Management/src/com/raven/dialog/RoomDialog.java</file>
+            <file>file:/E:/UIT_3/HK2/SE330_Java/HotelManagement_Java/Hotel_Management/src/com/raven/dialog/CustomerDialog.java</file>
+            <file>file:/E:/UIT_3/HK2/SE330_Java/HotelManagement_Java/Hotel_Management/src/com/raven/dialog/RoomTypeDialog.java</file>
+            <file>file:/E:/UIT_3/HK2/SE330_Java/HotelManagement_Java/Hotel_Management/src/com/raven/dialog/ServiceDialog.java</file>
+            <file>file:/E:/UIT_3/HK2/SE330_Java/HotelManagement_Java/Hotel_Management/src/com/raven/controller/ServiceController.java</file>
+            <file>file:/E:/UIT_3/HK2/SE330_Java/HotelManagement_Java/Hotel_Management/src/com/raven/controller/RoomController.java</file>
         </group>
     </open-files>
 </project-private>

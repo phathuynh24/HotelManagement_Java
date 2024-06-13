@@ -7,6 +7,7 @@ import com.raven.utils.DataChangeListener;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Objects;
 
 public class ServiceDialog {
 
@@ -27,19 +28,23 @@ public class ServiceDialog {
         if (purpose.equals("Add")) {
             initUI("Thêm dịch vụ");
             saveButton.addActionListener(e -> {
-                saveService();
-                JOptionPane.showMessageDialog(null, "Thêm dịch vụ thành công");
-                frame.dispose();
-                dataChangeListener.onDataChanged();
+                if (validateInputs()) {
+                    saveService();
+                    JOptionPane.showMessageDialog(null, "Thêm dịch vụ thành công");
+                    frame.dispose();
+                    dataChangeListener.onDataChanged();
+                }
             });
         } else if (purpose.equals("Update")) {
             initUI("Cập nhật dịch vụ");
             loadData();
             saveButton.addActionListener(e -> {
-                updateService();
-                JOptionPane.showMessageDialog(null, "Cập nhật dịch vụ thành công");
-                frame.dispose();
-                dataChangeListener.onDataChanged();
+                if (validateInputs()) {
+                    updateService();
+                    JOptionPane.showMessageDialog(null, "Cập nhật dịch vụ thành công");
+                    frame.dispose();
+                    dataChangeListener.onDataChanged();
+                }
             });
         }
     }
@@ -207,5 +212,41 @@ public class ServiceDialog {
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+    }
+
+    private boolean validateInputs() {
+        String code = codeField.getText();
+        String name = nameField.getText();
+        String unit = unitField.getText();
+        String priceStr = priceField.getText();
+        String status = statusField.getText();
+
+        // Kiểm tra các trường bắt buộc không được để trống
+        if (isEmptyOrWhitespace(code) || isEmptyOrWhitespace(name) || isEmptyOrWhitespace(unit)
+                || isEmptyOrWhitespace(priceStr) || isEmptyOrWhitespace(status)) {
+            JOptionPane.showMessageDialog(frame, "Vui lòng nhập đầy đủ thông tin.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
+        // Kiểm tra giá là số nguyên dương
+        if (!isPositiveInteger(priceStr)) {
+            JOptionPane.showMessageDialog(frame, "Giá phải là số nguyên dương.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean isPositiveInteger(String str) {
+        try {
+            int num = Integer.parseInt(str);
+            return num > 0;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    private boolean isEmptyOrWhitespace(String str) {
+        return str == null || str.trim().isEmpty();
     }
 }

@@ -66,6 +66,11 @@ public class CustomerController {
         return null;
     }
 
+    public boolean isCCCDExist(String idCard) {
+        Document customerDocument = customerCollection.find(Filters.eq("idCard", idCard)).first();
+        return customerDocument != null;
+    }
+
     public List<Model_Customer> getAllCustomers() {
         List<Model_Customer> customersList = new ArrayList<>();
         FindIterable<Document> customerDocuments = customerCollection.find();

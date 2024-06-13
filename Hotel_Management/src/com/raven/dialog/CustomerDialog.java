@@ -29,19 +29,23 @@ public class CustomerDialog {
         if (purpose.equals("Add")) {
             initUI("Thêm khách hàng");
             saveButton.addActionListener(e -> {
-                saveCustomer();
-                JOptionPane.showMessageDialog(null, "Thêm khách hàng thành công");
-                frame.dispose();
-                dataChangeListener.onDataChanged();
+                if (validateFields()) {
+                    saveCustomer();
+                    JOptionPane.showMessageDialog(null, "Thêm khách hàng thành công");
+                    frame.dispose();
+                    dataChangeListener.onDataChanged();
+                }
             });
         } else if (purpose.equals("Update")) {
             initUI("Cập nhật khách hàng");
             loadData();
             saveButton.addActionListener(e -> {
-                updateCustomer();
-                JOptionPane.showMessageDialog(null, "Cập nhật khách hàng thành công");
-                frame.dispose();
-                dataChangeListener.onDataChanged();
+                if (validateFields()) {
+                    updateCustomer();
+                    JOptionPane.showMessageDialog(null, "Cập nhật khách hàng thành công");
+                    frame.dispose();
+                    dataChangeListener.onDataChanged();
+                }
             });
         }
     }
@@ -63,7 +67,7 @@ public class CustomerDialog {
         String id = idCardField.getText();
         String name = nameField.getText();
         String phone = phoneField.getText();
-        String gender = maleRadioButton.isSelected() ? "Nam" : "nữ";
+        String gender = maleRadioButton.isSelected() ? "Nam" : "Nữ";
         String address = addressField.getText();
         String email = emailField.getText();
 
@@ -81,6 +85,46 @@ public class CustomerDialog {
 
         Model_Customer updatedCustomer = new Model_Customer(id, name, gender, phone, email, address);
         customerController.updateCustomer(id, updatedCustomer);
+    }
+
+    private boolean validateFields() {
+        String id = idCardField.getText();
+        String name = nameField.getText();
+        String phone = phoneField.getText();
+        String address = addressField.getText();
+        String email = emailField.getText();
+
+        if (id.isEmpty() || name.isEmpty() || phone.isEmpty() || address.isEmpty() || email.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Vui lòng điền đầy đủ tất cả các trường");
+            return false;
+        }
+
+        if (!id.matches("\\d+")) {
+            JOptionPane.showMessageDialog(null, "CCCD chỉ được chứa số");
+            return false;
+        }
+
+        if (!name.matches("[\\p{L} ]+")) {
+            JOptionPane.showMessageDialog(null, "Tên chỉ được chứa chữ cái");
+            return false;
+        }
+
+        if (!phone.matches("\\d{10,11}")) {
+            JOptionPane.showMessageDialog(null, "Số điện thoại không hợp lệ");
+            return false;
+        }
+
+        if (!email.matches("^[\\w.%+-]+@[\\w.-]+\\.[a-zA-Z]{2,6}$")) {
+            JOptionPane.showMessageDialog(null, "Email không hợp lệ");
+            return false;
+        }
+
+        if (customerController.isCCCDExist(id)) {
+            JOptionPane.showMessageDialog(null, "CCCD đã tồn tại");
+            return false;
+        }
+
+        return true;
     }
 
     private void initUI(String purposeName) {
@@ -127,7 +171,7 @@ public class CustomerDialog {
         java.awt.GridBagConstraints gbc = new java.awt.GridBagConstraints();
         gbc.insets = new java.awt.Insets(5, 5, 5, 5);
 
-        JLabel label1 = new JLabel("Mã khách hàng:", SwingConstants.LEFT);
+        JLabel label1 = new JLabel("CCCD:", SwingConstants.LEFT);
         label1.setFont(labelFont);
         frame.add(label1, gbc);
 

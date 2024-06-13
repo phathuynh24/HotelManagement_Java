@@ -7,6 +7,7 @@ import com.raven.utils.DataChangeListener;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.regex.Pattern;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
@@ -14,7 +15,7 @@ import javax.swing.text.PlainDocument;
 public class EmployeeDialog {
 
     private JTextField idField;
-    private JTextField idCardField;  // Added field for ID Card
+    private JTextField idCardField;  // Thêm trường cho CCCD
     private JTextField nameField;
     private JTextField phoneField;
     private JRadioButton maleRadioButton;
@@ -25,7 +26,7 @@ public class EmployeeDialog {
     private JTextField statusField;
     private JTextField userNameField;
     private JPasswordField passwordField;
-    private JPasswordField reenterPasswordField; // Added field for re-entering password
+    private JPasswordField reenterPasswordField; // Thêm trường cho nhập lại mật khẩu
 
     private final EmployeeController employeeController = new EmployeeController();
     private final Model_Employee employee;
@@ -38,7 +39,7 @@ public class EmployeeDialog {
         if (purpose.equals("Add")) {
             initUI("Thêm nhân viên");
             saveButton.addActionListener(e -> {
-                if (validatePasswords()) {
+                if (validateFields() && validatePasswords()) {
                     saveEmployee();
                     JOptionPane.showMessageDialog(null, "Thêm nhân viên thành công");
                     frame.dispose();
@@ -49,7 +50,7 @@ public class EmployeeDialog {
             initUI("Cập nhật nhân viên");
             loadData();
             saveButton.addActionListener(e -> {
-                if (validatePasswords()) {
+                if (validateFields() && validatePasswords()) {
                     updateEmployee();
                     JOptionPane.showMessageDialog(null, "Cập nhật nhân viên thành công");
                     frame.dispose();
@@ -61,7 +62,7 @@ public class EmployeeDialog {
 
     private void loadData() {
         idField.setText(employee.getId());
-        idCardField.setText(employee.getIdCard());  // Load ID Card data
+        idCardField.setText(employee.getIdCard());  // Load dữ liệu CCCD
         nameField.setText(employee.getName());
         phoneField.setText(employee.getPhone());
         if (employee.getGender().equalsIgnoreCase("Nam")) {
@@ -74,12 +75,12 @@ public class EmployeeDialog {
         statusField.setText(employee.getStatus());
         userNameField.setText(employee.getUserName());
         passwordField.setText(employee.getPassword());
-        reenterPasswordField.setText(employee.getPassword()); // Load re-enter password with the same value
+        reenterPasswordField.setText(employee.getPassword()); // Load nhập lại mật khẩu với cùng giá trị
     }
 
     private void saveEmployee() {
         String id = idField.getText();
-        String idCard = idCardField.getText();  // Get ID Card data
+        String idCard = idCardField.getText();  // Lấy dữ liệu CCCD
         String name = nameField.getText();
         String phone = phoneField.getText();
         String gender = maleRadioButton.isSelected() ? "Nam" : "Nữ";
@@ -96,7 +97,7 @@ public class EmployeeDialog {
 
     private void updateEmployee() {
         String id = idField.getText();
-        String idCard = idCardField.getText();  // Get ID Card data
+        String idCard = idCardField.getText();  // Lấy dữ liệu CCCD
         String name = nameField.getText();
         String phone = phoneField.getText();
         String gender = maleRadioButton.isSelected() ? "Nam" : "Nữ";
@@ -120,7 +121,7 @@ public class EmployeeDialog {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
         idField = new JTextField(20);
-        idCardField = new JTextField(20);  // Added field for ID Card
+        idCardField = new JTextField(20);  // Thêm trường cho CCCD
         nameField = new JTextField(20);
         phoneField = new JTextField(20);
         maleRadioButton = new JRadioButton("Nam");
@@ -131,7 +132,7 @@ public class EmployeeDialog {
         statusField = new JTextField(20);
         userNameField = new JTextField(20);
         passwordField = new JPasswordField(20);
-        reenterPasswordField = new JPasswordField(20); // Added field for re-entering password
+        reenterPasswordField = new JPasswordField(20); // Thêm trường cho nhập lại mật khẩu
 
         if (purposeName.equals("Thêm nhân viên")) {
             idField.setText(employeeController.createId());
@@ -140,7 +141,7 @@ public class EmployeeDialog {
         idField.setEditable(false);
         idField.setEnabled(false);
 
-        // Format date of birth field
+        // Định dạng trường ngày sinh
         dobField.setDocument(new PlainDocument() {
             @Override
             public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
@@ -193,7 +194,7 @@ public class EmployeeDialog {
         JLabel label2 = new JLabel("Tên nhân viên:", SwingConstants.LEFT);
         label2.setFont(labelFont);
 
-        JLabel label11 = new JLabel("CCCD:", SwingConstants.LEFT);  // Added label for ID Card
+        JLabel label11 = new JLabel("CCCD:", SwingConstants.LEFT);  // Thêm nhãn cho CCCD
         label11.setFont(labelFont);
 
         JLabel label3 = new JLabel("Số điện thoại:", SwingConstants.LEFT);
@@ -220,7 +221,7 @@ public class EmployeeDialog {
         JLabel label10 = new JLabel("Mật khẩu:", SwingConstants.LEFT);
         label10.setFont(labelFont);
 
-        JLabel label12 = new JLabel("Nhập lại mật khẩu:", SwingConstants.LEFT);  // Added label for re-entering password
+        JLabel label12 = new JLabel("Nhập lại mật khẩu:", SwingConstants.LEFT);  // Thêm nhãn cho nhập lại mật khẩu
         label12.setFont(labelFont);
 
         gbc.gridx = 0;
@@ -235,6 +236,8 @@ public class EmployeeDialog {
         gbc.gridy = 1;
         gbc.anchor = java.awt.GridBagConstraints.WEST;
         frame.add(label2, gbc);
+
+
 
         gbc.gridx = 1;
         frame.add(nameField, gbc);
@@ -366,6 +369,44 @@ public class EmployeeDialog {
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+    }
+
+     private boolean validateFields() {
+         // Kiểm tra các trường không được để trống
+        if (nameField.getText().isEmpty() || idCardField.getText().isEmpty() || phoneField.getText().isEmpty() ||
+            emailField.getText().isEmpty() || dobField.getText().isEmpty() || statusField.getText().isEmpty() ||
+            userNameField.getText().isEmpty() || passwordField.getPassword().length == 0 ||
+            reenterPasswordField.getPassword().length == 0) {
+            JOptionPane.showMessageDialog(frame, "Vui lòng nhập đầy đủ các trường", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
+        // Kiểm tra tên nhân viên chỉ chứa chữ cái và khoảng trắng
+        if (!nameField.getText().matches("[a-zA-Z\\s]+")) {
+            JOptionPane.showMessageDialog(frame, "Tên nhân viên chỉ được chứa chữ cái và khoảng trắng", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
+        // Kiểm tra CCCD chỉ chứa số và độ dài là 12 ký tự
+        if (!idCardField.getText().matches("\\d{12}")) {
+            JOptionPane.showMessageDialog(frame, "CCCD phải chứa 12 chữ số", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
+        // Kiểm tra số điện thoại hợp lệ (10 số và bắt đầu bằng 0)
+        if (!phoneField.getText().matches("0\\d{9}")) {
+            JOptionPane.showMessageDialog(frame, "Số điện thoại phải chứa 10 chữ số và bắt đầu bằng số 0", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
+        // Kiểm tra email hợp lệ
+        if (!emailField.getText().matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$")) {
+            JOptionPane.showMessageDialog(frame, "Email không hợp lệ", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
+        
+        return true;
     }
 
     private boolean validatePasswords() {

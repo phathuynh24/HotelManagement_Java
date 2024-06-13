@@ -4,8 +4,13 @@ import com.raven.controller.RoomController;
 import com.raven.model.Model_Room;
 import com.raven.swing.ButtonHover;
 import com.raven.utils.DataChangeListener;
+
 import javax.swing.*;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.PlainDocument;
 import java.awt.*;
+import java.util.Objects;
 
 public class RoomDialog {
 
@@ -26,19 +31,23 @@ public class RoomDialog {
         if (purpose.equals("Add")) {
             initUI("Thêm phòng");
             saveButton.addActionListener(e -> {
-                saveRoom();
-                JOptionPane.showMessageDialog(null, "Thêm phòng thành công");
-                frame.dispose();
-                dataChangeListener.onDataChanged();
+                if (validateInputs()) {
+                    saveRoom();
+                    JOptionPane.showMessageDialog(null, "Thêm phòng thành công");
+                    frame.dispose();
+                    dataChangeListener.onDataChanged();
+                }
             });
         } else if (purpose.equals("Update")) {
             initUI("Cập nhật phòng");
             loadData();
             saveButton.addActionListener(e -> {
-                updateRoom();
-                JOptionPane.showMessageDialog(null, "Cập nhật phòng thành công");
-                frame.dispose();
-                dataChangeListener.onDataChanged();
+                if (validateInputs()) {
+                    updateRoom();
+                    JOptionPane.showMessageDialog(null, "Cập nhật phòng thành công");
+                    frame.dispose();
+                    dataChangeListener.onDataChanged();
+                }
             });
         }
     }
@@ -55,8 +64,8 @@ public class RoomDialog {
         String code = codeField.getText();
         String name = nameField.getText();
         int capacity = Integer.parseInt(capacityField.getText());
-        String floor = (String) floorComboBox.getSelectedItem();
-        String type = (String) typeComboBox.getSelectedItem();
+        String floor = Objects.requireNonNull(floorComboBox.getSelectedItem()).toString();
+        String type = Objects.requireNonNull(typeComboBox.getSelectedItem()).toString();
 
         Model_Room newRoom = new Model_Room(code, name, type, floor, capacity);
         roomController.addRoom(newRoom);
@@ -66,8 +75,8 @@ public class RoomDialog {
         String code = codeField.getText();
         String name = nameField.getText();
         int capacity = Integer.parseInt(capacityField.getText());
-        String floor = (String) floorComboBox.getSelectedItem();
-        String type = (String) typeComboBox.getSelectedItem();
+        String floor = Objects.requireNonNull(floorComboBox.getSelectedItem()).toString();
+        String type = Objects.requireNonNull(typeComboBox.getSelectedItem()).toString();
 
         Model_Room updatedRoom = new Model_Room(code, name, type, floor, capacity);
         roomController.updateRoom(code, updatedRoom);
@@ -115,24 +124,6 @@ public class RoomDialog {
 
         JLabel label1 = new JLabel("Mã phòng:", SwingConstants.LEFT);
         label1.setFont(labelFont);
-        frame.add(label1, gbc);
-
-        JLabel label2 = new JLabel("Tên phòng:", SwingConstants.LEFT);
-        label2.setFont(labelFont);
-        frame.add(label2, gbc);
-
-        JLabel label3 = new JLabel("Sức chứa:", SwingConstants.LEFT);
-        label3.setFont(labelFont);
-        frame.add(label3, gbc);
-
-        JLabel label4 = new JLabel("Tầng:", SwingConstants.LEFT);
-        label4.setFont(labelFont);
-        frame.add(label4, gbc);
-
-        JLabel label5 = new JLabel("Loại phòng:", SwingConstants.LEFT);
-        label5.setFont(labelFont);
-        frame.add(label5, gbc);
-
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = java.awt.GridBagConstraints.WEST;
@@ -141,6 +132,8 @@ public class RoomDialog {
         gbc.gridx = 1;
         frame.add(codeField, gbc);
 
+        JLabel label2 = new JLabel("Tên phòng:", SwingConstants.LEFT);
+        label2.setFont(labelFont);
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.anchor = java.awt.GridBagConstraints.WEST;
@@ -149,6 +142,8 @@ public class RoomDialog {
         gbc.gridx = 1;
         frame.add(nameField, gbc);
 
+        JLabel label3 = new JLabel("Sức chứa:", SwingConstants.LEFT);
+        label3.setFont(labelFont);
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.anchor = java.awt.GridBagConstraints.WEST;
@@ -157,6 +152,8 @@ public class RoomDialog {
         gbc.gridx = 1;
         frame.add(capacityField, gbc);
 
+        JLabel label4 = new JLabel("Tầng:", SwingConstants.LEFT);
+        label4.setFont(labelFont);
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.anchor = java.awt.GridBagConstraints.WEST;
@@ -165,6 +162,8 @@ public class RoomDialog {
         gbc.gridx = 1;
         frame.add(floorComboBox, gbc);
 
+        JLabel label5 = new JLabel("Loại phòng:", SwingConstants.LEFT);
+        label5.setFont(labelFont);
         gbc.gridx = 0;
         gbc.gridy = 4;
         gbc.anchor = java.awt.GridBagConstraints.WEST;
@@ -183,14 +182,14 @@ public class RoomDialog {
         gbc.anchor = java.awt.GridBagConstraints.EAST;
         frame.add(buttonPanel, gbc);
 
-        // Thiết lập màu nền cho JFrame
+        // Thiết lập màu nền cho JFrame và JPanel
         frame.getContentPane().setBackground(Color.WHITE);
         buttonPanel.setBackground(Color.WHITE);
 
         saveButton.setFont(buttonFont);
         cancelButton.setFont(buttonFont);
 
-        // Thiết lập kích thước và căn giữa cho JTextField và JComboBox
+        // Thiết lập kích thước và căn giữa cho các thành phần
         Dimension fieldDimension = new Dimension(200, 30);
         codeField.setPreferredSize(fieldDimension);
         codeField.setFont(textFieldFont);
@@ -203,9 +202,35 @@ public class RoomDialog {
         typeComboBox.setPreferredSize(fieldDimension);
         typeComboBox.setFont(textFieldFont);
 
+        // Thiết lập ràng buộc cho capacityField chỉ nhập số
+        capacityField.setDocument(new PlainDocument() {
+            @Override
+            public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
+                if (str == null) return;
+                if (str.matches("[0-9]*")) {
+                    super.insertString(offs, str, a);
+                }
+            }
+        });
+
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
-}
 
+    private boolean validateInputs() {
+        if (nameField.getText().isEmpty() || capacityField.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(frame, "Vui lòng điền đầy đủ thông tin cho tên phòng và sức chứa.");
+            return false;
+        }
+
+        try {
+            Integer.parseInt(capacityField.getText());
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(frame, "Sức chứa phòng phải là một số nguyên.");
+            return false;
+        }
+
+        return true;
+    }
+}

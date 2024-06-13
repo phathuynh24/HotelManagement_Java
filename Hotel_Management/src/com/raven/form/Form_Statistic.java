@@ -8,6 +8,7 @@ import com.raven.controller.InvoiceController;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import static java.lang.Integer.parseInt;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingConstants;
 import org.bson.Document;
 
 public class Form_Statistic extends javax.swing.JPanel {
@@ -66,10 +68,21 @@ public class Form_Statistic extends javax.swing.JPanel {
         cbBox4.setBackground(new java.awt.Color(28, 181, 224));
         cbBox4.setForeground(java.awt.Color.WHITE);
 
-        btn1 = new JButton();
+//        btn1 = new JButton();
+//        btn1.setText("Cập nhật thông tin cho biểu đồ");
+//        btn1.setBackground(new java.awt.Color(28, 181, 224));
+//        btn1.setForeground(java.awt.Color.WHITE);
+//        btn1.addActionListener((java.awt.event.ActionEvent evt) -> {
+//            btn1ActionPerformed(evt);
+//        });
+      btn1 = new JButton();
         btn1.setText("Cập nhật thông tin cho biểu đồ");
         btn1.setBackground(new java.awt.Color(28, 181, 224));
         btn1.setForeground(java.awt.Color.WHITE);
+        btn1.setPreferredSize(new Dimension(200, 40)); // Kích thước nút
+        btn1.setFont(new Font("Arial", Font.PLAIN, 18)); // Kích thước phông chữ
+        btn1.setHorizontalAlignment(SwingConstants.CENTER); // Căn giữa nút ngang
+        btn1.setVerticalAlignment(SwingConstants.CENTER); // Căn giữa nút dọc
         btn1.addActionListener((java.awt.event.ActionEvent evt) -> {
             btn1ActionPerformed(evt);
         });
@@ -116,12 +129,16 @@ public class Form_Statistic extends javax.swing.JPanel {
                                                 .addComponent(cbBox4, javax.swing.GroupLayout.PREFERRED_SIZE, 200, Short.MAX_VALUE)
                                                 .addGap(200)
                                         )
-                                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                                .addContainerGap()
-                                                .addGap(190)
-                                                .addComponent(btn1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, Short.MAX_VALUE)
-                                                .addGap(480)
-                                        )
+                           .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                             .addContainerGap()
+                             .addComponent(btn1, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
+                             .addContainerGap(650, Short.MAX_VALUE) 
+                         )
+
+            )
+
+                                 
                                 )
                         )
         );

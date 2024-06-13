@@ -4,18 +4,13 @@ import com.raven.controller.RoomTypeController;
 import com.raven.model.Model_RoomType;
 import com.raven.swing.ButtonHover;
 import com.raven.utils.DataChangeListener;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FlowLayout;
 
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
+import javax.swing.*;
+import java.awt.*;
+import java.util.Objects;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.PlainDocument;
 
 public class RoomTypeDialog {
 
@@ -35,19 +30,23 @@ public class RoomTypeDialog {
         if (purpose.equals("Add")) {
             initUI("Thêm loại phòng");
             saveButton.addActionListener(e -> {
-                saveTypeRoom();
-                JOptionPane.showMessageDialog(null, "Thêm loại phòng thành công");
-                frame.dispose();
-                dataChangeListener.onDataChanged();
+                if (validateInputs()) {
+                    saveTypeRoom();
+                    JOptionPane.showMessageDialog(null, "Thêm loại phòng thành công");
+                    frame.dispose();
+                    dataChangeListener.onDataChanged();
+                }
             });
         } else if (purpose.equals("Update")) {
             initUI("Cập nhật loại phòng");
             loadData();
             saveButton.addActionListener(e -> {
-                updateTypeRoom();
-                JOptionPane.showMessageDialog(null, "Cập nhật loại phòng thành công");
-                frame.dispose();
-                dataChangeListener.onDataChanged();
+                if (validateInputs()) {
+                    updateTypeRoom();
+                    JOptionPane.showMessageDialog(null, "Cập nhật loại phòng thành công");
+                    frame.dispose();
+                    dataChangeListener.onDataChanged();
+                }
             });
         }
     }
@@ -94,7 +93,7 @@ public class RoomTypeDialog {
         nameField = new JTextField(20);
         descriptionField = new JTextField(20);
         priceField = new JTextField(20);
-        typeComboBox = new JComboBox<>(new String[]{"SINGLE", "DOUBLE", "STANDARD", "SUITE", "TWIN", "DELUXE", "EXECUTIVE", "CONNECTINGv", "PENTHOUSE_SUITE", "HONEYMOON_SUITE"});
+        typeComboBox = new JComboBox<>(new String[]{"SINGLE", "DOUBLE", "STANDARD", "SUITE", "TWIN", "DELUXE", "EXECUTIVE", "CONNECTING", "PENTHOUSE_SUITE", "HONEYMOON_SUITE"});
         typeComboBox.setEditable(true);
 
         codeField.setEditable(false);
@@ -210,8 +209,39 @@ public class RoomTypeDialog {
         typeComboBox.setPreferredSize(fieldDimension);
         typeComboBox.setFont(textFieldFont);
 
+        // Thiết lập ràng buộc cho priceField chỉ nhập số
+        priceField.setDocument(new PlainDocument() {
+            @Override
+            public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
+                if (str == null) return;
+                if (str.matches("[0-9]*")) {
+                    super.insertString(offs, str, a);
+                }
+            }
+        });
+
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+    }
+
+    private boolean validateInputs() {
+        if (nameField.getText().isEmpty() || priceField.getText().isEmpty() || descriptionField.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(frame, "Vui lòng điền đầy đủ thông tin cho tên, đơn giá và mô tả loại phòng.");
+            return false;
+        }
+
+        try {
+            int price = Integer.parseInt(priceField.getText());
+            if (price < 0) {
+                JOptionPane.showMessageDialog(frame, "Đơn giá phòng phải là một số.");
+                return false;
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(frame, "Đơn giá phòng phải là một số.");
+            return false;
+        }
+
+        return true;
     }
 }

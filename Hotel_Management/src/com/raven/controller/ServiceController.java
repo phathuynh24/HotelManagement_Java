@@ -9,9 +9,10 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Sorts;
 import com.raven.model.Model_Service;
 import com.raven.utils.MongoDBConfig;
+import org.bson.Document;
+
 import java.util.ArrayList;
 import java.util.List;
-import org.bson.Document;
 
 public class ServiceController {
 
@@ -22,12 +23,12 @@ public class ServiceController {
         MongoDatabase database = mongoClient.getDatabase(MongoDBConfig.DATABASE_NAME);
         serviceCollection = database.getCollection(MongoDBConfig.COLLECTION_SERVICE);
     }
-    
+
     public String createId() {
-        Document lastFloor = serviceCollection.find().sort(Sorts.descending("code")).first();
-        
-        if (lastFloor != null) {
-            String lastId = lastFloor.getString("code");
+        Document lastService = serviceCollection.find().sort(Sorts.descending("code")).first();
+
+        if (lastService != null) {
+            String lastId = lastService.getString("code");
             int numericPart = Integer.parseInt(lastId.substring(2));
             numericPart++;
             return String.format("DV%03d", numericPart);
@@ -65,13 +66,7 @@ public class ServiceController {
     public Model_Service getServiceById(String serviceId) {
         Document serviceDocument = serviceCollection.find(Filters.eq("code", serviceId)).first();
         if (serviceDocument != null) {
-            return new Model_Service(
-                serviceDocument.getString("code"),
-                serviceDocument.getString("name"),
-                serviceDocument.getInteger("price"),
-                serviceDocument.getString("unit"),
-                serviceDocument.getString("status")
-            );
+            return documentToModel(serviceDocument);
         }
         return null;
     }
@@ -80,13 +75,7 @@ public class ServiceController {
         List<Model_Service> servicesList = new ArrayList<>();
         FindIterable<Document> serviceDocuments = serviceCollection.find();
         for (Document serviceDocument : serviceDocuments) {
-            Model_Service service = new Model_Service(
-                serviceDocument.getString("code"),
-                serviceDocument.getString("name"),
-                serviceDocument.getInteger("price"),
-                serviceDocument.getString("unit"),
-                serviceDocument.getString("status")
-            );
+            Model_Service service = documentToModel(serviceDocument);
             servicesList.add(service);
         }
 
@@ -102,18 +91,33 @@ public class ServiceController {
         return servicesList;
     }
 
+    private Model_Service documentToModel(Document serviceDocument) {
+        String id = serviceDocument.getString("code");
+        String name = serviceDocument.getString("name");
+        int price = getPriceFromDocument(serviceDocument);
+        String unit = serviceDocument.getString("unit");
+        String status = serviceDocument.getString("status");
+
+        return new Model_Service(id, name, price, unit, status);
+    }
+
+    private int getPriceFromDocument(Document serviceDocument) {
+        Object priceObj = serviceDocument.get("price");
+        if (priceObj instanceof Integer) {
+            return (int) priceObj;
+        } else if (priceObj instanceof Double) {
+            return ((Double) priceObj).intValue();
+        } else {
+            throw new IllegalStateException("Unexpected price type in MongoDB document.");
+        }
+    }
+
     public List<Model_Service> searchServices(String keyword) {
         List<Model_Service> servicesList = new ArrayList<>();
         FindIterable<Document> serviceDocuments = serviceCollection.find();
         String lowerCaseKeyword = keyword.toLowerCase();
         for (Document serviceDocument : serviceDocuments) {
-            Model_Service service = new Model_Service(
-                serviceDocument.getString("code"),
-                serviceDocument.getString("name"),
-                serviceDocument.getInteger("price"),
-                serviceDocument.getString("unit"),
-                serviceDocument.getString("status")
-            );
+            Model_Service service = documentToModel(serviceDocument);
             if (containsKeyword(service, lowerCaseKeyword)) {
                 servicesList.add(service);
             }
@@ -137,4 +141,3 @@ public class ServiceController {
                 || status.contains(lowerCaseKeyword);
     }
 }
-

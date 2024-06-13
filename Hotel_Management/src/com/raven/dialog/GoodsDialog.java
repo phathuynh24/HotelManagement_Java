@@ -6,7 +6,11 @@ import com.raven.swing.ButtonHover;
 import com.raven.utils.DataChangeListener;
 
 import javax.swing.*;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.PlainDocument;
 import java.awt.*;
+import java.util.Objects;
 
 public class GoodsDialog {
 
@@ -29,19 +33,23 @@ public class GoodsDialog {
         if (purpose.equals("Add")) {
             initUI("Thêm hàng hóa");
             saveButton.addActionListener(e -> {
-                saveGoods();
-                JOptionPane.showMessageDialog(null, "Thêm hàng hóa thành công");
-                frame.dispose();
-                dataChangeListener.onDataChanged();
+                if (validateInputs()) {
+                    saveGoods();
+                    JOptionPane.showMessageDialog(null, "Thêm hàng hóa thành công");
+                    frame.dispose();
+                    dataChangeListener.onDataChanged();
+                }
             });
         } else if (purpose.equals("Update")) {
             initUI("Cập nhật hàng hóa");
             loadData();
             saveButton.addActionListener(e -> {
-                updateGoods();
-                JOptionPane.showMessageDialog(null, "Cập nhật hàng hóa thành công");
-                frame.dispose();
-                dataChangeListener.onDataChanged();
+                if (validateInputs()) {
+                    updateGoods();
+                    JOptionPane.showMessageDialog(null, "Cập nhật hàng hóa thành công");
+                    frame.dispose();
+                    dataChangeListener.onDataChanged();
+                }
             });
         }
     }
@@ -240,10 +248,61 @@ public class GoodsDialog {
         descriptionField.setPreferredSize(fieldDimension);
         descriptionField.setFont(textFieldFont);
         statusField.setPreferredSize(fieldDimension);
+        descriptionField.setFont(textFieldFont);
+
         statusField.setFont(textFieldFont);
 
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
+private boolean validateInputs() {
+    String code = codeField.getText();
+    String name = nameField.getText();
+    String unit = unitField.getText();
+    String importPriceStr = importPriceField.getText();
+    String sellPriceStr = sellPriceField.getText();
+    String description = descriptionField.getText();
+    String status = statusField.getText();
+
+    // Kiểm tra các trường bắt buộc không được để trống
+    if (code.isEmpty() || name.isEmpty() || unit.isEmpty() || importPriceStr.isEmpty()
+            || sellPriceStr.isEmpty() || description.isEmpty() || status.isEmpty()) {
+        JOptionPane.showMessageDialog(frame, "Vui lòng nhập đầy đủ thông tin.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        return false;
+    }
+
+    // Kiểm tra giá nhập là số nguyên dương
+    if (!isPositiveInteger(importPriceStr)) {
+        JOptionPane.showMessageDialog(frame, "Giá nhập phải là số.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        return false;
+    }
+
+    // Kiểm tra giá bán là số nguyên dương
+    if (!isPositiveInteger(sellPriceStr)) {
+        JOptionPane.showMessageDialog(frame, "Giá bán phải là số.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        return false;
+    }
+
+    // Kiểm tra trường Trạng thái chỉ chứa các ký tự chữ
+    if (!isAlphaString(status)) {
+        JOptionPane.showMessageDialog(frame, "Trạng thái chỉ được chứa chữ cái.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        return false;
+    }
+
+    return true;
+}
+
+private boolean isPositiveInteger(String str) {
+    try {
+        int num = Integer.parseInt(str);
+        return num > 0;
+    } catch (NumberFormatException e) {
+        return false;
+    }
+}
+
+private boolean isAlphaString(String str) {
+    return str.matches("[a-zA-Z]+");
+}
 }
