@@ -18,9 +18,9 @@ Phần mềm quản lý khách sạn được thiết kế nhằm hỗ trợ kh�
 
 ### Công cụ:
 
-- **IDE:** Visual Studio Community 2022
+- **IDE:** NetBean
 - **Ngôn ngữ lập trình:** Java
-- **Framework & Library:** NetBeans
+- **Framework & Library:** Java Swing
 - **Design Pattern:** StarUML
 - **Database**: MongoDB
 
@@ -40,6 +40,6 @@ Phần mềm quản lý khách sạn được thiết kế nhằm hỗ trợ kh�
 - **Quản lý hóa đơn**
 
 
-
+### 
 - **Design Pattern:** StarUML
 - **Database**: MongoDB
